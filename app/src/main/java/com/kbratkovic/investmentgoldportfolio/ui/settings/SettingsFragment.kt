@@ -1,4 +1,4 @@
-package com.kbratkovic.investmentgoldportfolio.ui.gallery
+package com.kbratkovic.investmentgoldportfolio.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,11 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.kbratkovic.investmentgoldportfolio.R
 
-//import com.kbratkovic.investmentgoldportfolio.databinding.FragmentGalleryBinding
+//import com.kbratkovic.investmentgoldportfolio.databinding.FragmentHomeBinding
 
-class GalleryFragment : Fragment(R.layout.fragment_gallery) {
+class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
-//    private var _binding: FragmentGalleryBinding? = null
+//    private var _binding: FragmentHomeBinding? = null
 //
 //    // This property is only valid between onCreateView and
 //    // onDestroyView.
@@ -24,14 +24,13 @@ class GalleryFragment : Fragment(R.layout.fragment_gallery) {
 //        container: ViewGroup?,
 //        savedInstanceState: Bundle?
 //    ): View {
-//        val galleryViewModel =
-//            ViewModelProvider(this).get(GalleryViewModel::class.java)
+//        val settingsViewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
 //
-//        _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+//        _binding = FragmentHomeBinding.inflate(inflater, container, false)
 //        val root: View = binding.root
 //
-//        val textView: TextView = binding.textGallery
-//        galleryViewModel.text.observe(viewLifecycleOwner) {
+//        val textView: TextView = binding.textHome
+//        settingsViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it
 //        }
 //        return root
