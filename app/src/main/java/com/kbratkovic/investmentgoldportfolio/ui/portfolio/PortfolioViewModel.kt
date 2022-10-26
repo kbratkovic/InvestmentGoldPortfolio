@@ -1,10 +1,10 @@
-package com.kbratkovic.investmentgoldportfolio.ui.home
+package com.kbratkovic.investmentgoldportfolio.ui.portfolio
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class PortfolioViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is home Fragment"

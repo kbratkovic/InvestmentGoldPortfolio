@@ -1,17 +1,11 @@
-package com.kbratkovic.investmentgoldportfolio.ui.slideshow
+package com.kbratkovic.investmentgoldportfolio.ui.addNewItem
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.kbratkovic.investmentgoldportfolio.R
 
 //import com.kbratkovic.investmentgoldportfolio.databinding.FragmentSlideshowBinding
 
-class SlideshowFragment : Fragment(R.layout.fragment_slideshow) {
+class AddNewItemFragment : Fragment(R.layout.fragment_addnewitem) {
 
 //    private var _binding: FragmentSlideshowBinding? = null
 //
