@@ -10,20 +10,21 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputEditText
 import com.kbratkovic.investmentgoldportfolio.R
 
-class AddNewItemFragment : Fragment(R.layout.fragment_addnewitem) {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+class AddNewItemFragment : Fragment() {
 
-        val addNewItemViewModel = ViewModelProvider(this).get(AddNewItemViewModel::class.java)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
+        val view = inflater.inflate(R.layout.fragment_addnewitem, container, false)
+        val slideshowViewModel = ViewModelProvider(this).get(AddNewItemViewModel::class.java)
 
-// varijable su null, ne valja ovak referenciranje
-        val editTextItemName: TextInputEditText? = view?.findViewById(R.id.editTextItemName)
-        val textView: TextView? = view?.findViewById(R.id.text_addNewItem)
-        addNewItemViewModel.text.observe(viewLifecycleOwner) {
-            textView?.text = it
+        val itemName: TextInputEditText = view.findViewById(R.id.editTextItemName)
+        val textView: TextView = view.findViewById(R.id.text_addNewItem)
+
+        slideshowViewModel.text.observe(viewLifecycleOwner) {
+            textView.text = it
         }
-    return null
+        return view
     }
 
 }
