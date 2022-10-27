@@ -37,10 +37,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_add_24"
-        app:layout_anchor="@id/bottom_navigation"
-        app:layout_anchorGravity="center_horizontal"
         android:layout_marginEnd="20dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="100dp"
         android:contentDescription="@string/add_new_nugget_to_portfolio" />
+<!--    app:layout_anchor="@id/bottom_navigation"-->
+<!--    app:layout_anchorGravity="end|top"-->
+
 
 <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
 <!--        android:id="@+id/fab"-->

@@ -1,11 +1,13 @@
 package com.kbratkovic.investmentgoldportfolio
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -55,8 +57,6 @@ class MainActivity : AppCompatActivity() {
         manageAddNewItemFab()
         manageDarkModeSwitch()
 
-        toolbar.title = getString(R.string.menu_portfolio)
-
     } // onCreate End
 
 
@@ -90,7 +90,9 @@ class MainActivity : AppCompatActivity() {
                         replace(R.id.fragmentContainer, settingsFragment)
                         addToBackStack(null)
                         commit()
+                        setToolbarTitle(settingsFragment)
                     }
+                    closeDrawerLayout()
                     true
                 }
                 R.id.nav_gallery -> {
@@ -98,7 +100,9 @@ class MainActivity : AppCompatActivity() {
                         replace(R.id.fragmentContainer, galleryFragment)
                         addToBackStack(null)
                         commit()
+                        setToolbarTitle(galleryFragment)
                     }
+                    closeDrawerLayout()
                     true
                 }
                 else -> false
@@ -115,12 +119,8 @@ class MainActivity : AppCompatActivity() {
                         replace(R.id.fragmentContainer, portfolioFragment)
                         addToBackStack(null)
                         commit()
-
-                        setToolbarTitle(portfolioFragment)
                     }
-
-//                    Snackbar.make(bottomNavigation, "Portfolio", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).setAnchorView(fab) .show()
+                    setToolbarTitle(portfolioFragment)
                     true
                 }
                 R.id.prices -> {
@@ -129,13 +129,7 @@ class MainActivity : AppCompatActivity() {
                         addToBackStack(null)
                         commit()
                     }
-
                     setToolbarTitle(portfolioFragment)
-
-
-//                    Snackbar.make(bottomNavigation, "Prices", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).setAnchorView(fab) .show()
-
                     true
                 }
                 else -> false
@@ -151,11 +145,7 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
                 commit()
             }
-
             setToolbarTitle(addNewItemFragment)
-
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).setAnchorView(fab) .show()
         }
     }
 
@@ -176,9 +166,14 @@ class MainActivity : AppCompatActivity() {
             portfolioFragment -> toolbar.title = getString(R.string.menu_portfolio)
             settingsFragment -> toolbar.title = getString(R.string.menu_settings)
             addNewItemFragment -> toolbar.title = getString(R.string.menu_add_new_item)
+            galleryFragment -> toolbar.title = getString(R.string.menu_gallery)
             else -> toolbar.title = getString(R.string.app_name)
         }
     }
 
+
+    private fun closeDrawerLayout() {
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
 
 }
