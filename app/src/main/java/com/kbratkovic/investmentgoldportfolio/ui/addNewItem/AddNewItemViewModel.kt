@@ -1,13 +1,36 @@
 package com.kbratkovic.investmentgoldportfolio.ui.addNewItem
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
+import com.kbratkovic.investmentgoldportfolio.Repository
+import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
+import com.kbratkovic.investmentgoldportfolio.database.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.database.InvestmentItemDao
+import kotlinx.coroutines.launch
 
-class AddNewItemViewModel : ViewModel() {
+//class AddNewItemViewModel(application: Application) : AndroidViewModel(application) {
+class AddNewItemViewModel(repository: Repository) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is AddNewItem Fragment"
-    }
-    val text: LiveData<String> = _text
+    // OK RADI
+//    init {
+//        val investmentItemDao = AppDatabase.getDatabase(application).investmentItemDao()
+//        val a  = 5
+//        var b = a + 4
+//    }
+
+//    private val repository: Repository = Repository(AppDatabase.getDatabase().investmentDao())
+//
+//    private val _text = MutableLiveData<String>().apply {
+//        value = "This is AddNewItem Fragment"
+//    }
+//    val text: LiveData<String> = _text
+//
+    val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
+//
+//    fun addInvestmentItem(item: InvestmentItem) {
+//        viewModelScope.launch {
+//            repository.addInvestmentItem(item)
+//        }
+//    }
+
 }

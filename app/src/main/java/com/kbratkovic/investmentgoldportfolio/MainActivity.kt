@@ -10,15 +10,19 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
+import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
+import com.kbratkovic.investmentgoldportfolio.ui.ViewModelProviderFactory
 import com.kbratkovic.investmentgoldportfolio.ui.gallery.GalleryFragment
 import com.kbratkovic.investmentgoldportfolio.ui.portfolio.PortfolioFragment
 import com.kbratkovic.investmentgoldportfolio.ui.settings.SettingsFragment
 import com.kbratkovic.investmentgoldportfolio.ui.addNewItem.AddNewItemFragment
+import com.kbratkovic.investmentgoldportfolio.ui.addNewItem.AddNewItemViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val galleryFragment = GalleryFragment()
     private val addNewItemFragment = AddNewItemFragment()
 
+    private lateinit var mAddNewItemViewModel: AddNewItemViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +52,9 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
 
-
+        val repository = Repository(AppDatabase.getDatabase(this))
+        val viewModelProviderFactory = ViewModelProviderFactory(repository)
+        mAddNewItemViewModel = ViewModelProvider(this, viewModelProviderFactory).get(AddNewItemViewModel::class.java)
 
         initializeViews()
         setSupportActionBar(toolbar)
