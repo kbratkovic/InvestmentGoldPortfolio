@@ -1,4 +1,4 @@
-package com.kbratkovic.investmentgoldportfolio.ui.gallery
+package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

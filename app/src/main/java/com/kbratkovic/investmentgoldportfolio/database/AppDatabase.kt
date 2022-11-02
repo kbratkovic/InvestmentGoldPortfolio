@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import java.util.concurrent.locks.Lock
+import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 
 @Database(entities = [InvestmentItem::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

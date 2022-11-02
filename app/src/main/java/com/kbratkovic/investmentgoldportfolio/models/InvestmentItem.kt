@@ -1,4 +1,4 @@
-package com.kbratkovic.investmentgoldportfolio.database
+package com.kbratkovic.investmentgoldportfolio.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

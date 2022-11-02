@@ -1,7 +1,6 @@
-package com.kbratkovic.investmentgoldportfolio
+package com.kbratkovic.investmentgoldportfolio.ui
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,13 +15,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
+import com.kbratkovic.investmentgoldportfolio.R
+import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
+import com.kbratkovic.investmentgoldportfolio.api.RetrofitInstance
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
-import com.kbratkovic.investmentgoldportfolio.ui.ViewModelProviderFactory
-import com.kbratkovic.investmentgoldportfolio.ui.gallery.GalleryFragment
-import com.kbratkovic.investmentgoldportfolio.ui.portfolio.PortfolioFragment
-import com.kbratkovic.investmentgoldportfolio.ui.settings.SettingsFragment
-import com.kbratkovic.investmentgoldportfolio.ui.addNewItem.AddNewItemFragment
-import com.kbratkovic.investmentgoldportfolio.ui.addNewItem.AddNewItemViewModel
+import com.kbratkovic.investmentgoldportfolio.repository.Repository
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.ApiPricesFragment
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.GalleryFragment
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.PortfolioFragment
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.SettingsFragment
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.AddNewItemFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,33 +40,42 @@ class MainActivity : AppCompatActivity() {
     private val settingsFragment = SettingsFragment()
     private val galleryFragment = GalleryFragment()
     private val addNewItemFragment = AddNewItemFragment()
+    private val apiPricesFragment = ApiPricesFragment()
 
-    private lateinit var mAddNewItemViewModel: AddNewItemViewModel
+    private lateinit var mMainViewModel: MainViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragmentContainer, portfolioFragment)
-            addToBackStack(null)
-            commit()
-        }
-
-        val repository = Repository(AppDatabase.getDatabase(this))
-        val viewModelProviderFactory = ViewModelProviderFactory(repository)
-        mAddNewItemViewModel = ViewModelProvider(this, viewModelProviderFactory).get(AddNewItemViewModel::class.java)
-
+        setDefaultFragment()
+        initializeViewModel()
         initializeViews()
-        setSupportActionBar(toolbar)
         drawerNavigationToggle()
         drawerNavigationItemSelectedListener()
         bottomNavigationItemSelectedListener()
         manageAddNewItemFab()
         manageDarkModeSwitch()
 
+
     } // onCreate End
+
+
+    private fun setDefaultFragment() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragmentContainer, portfolioFragment)
+            addToBackStack(null)
+            commit()
+        }
+    }
+
+
+    private fun initializeViewModel() {
+        val repository = Repository(AppDatabase.getDatabase(this))
+        val viewModelProviderFactory = ViewModelProviderFactory(repository)
+        mMainViewModel = ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
+    }
 
 
     private fun initializeViews() {
@@ -76,12 +87,16 @@ class MainActivity : AppCompatActivity() {
 
         val menuItem = navigationView.menu.findItem(R.id.switch_theme)
         materialSwitch = menuItem.actionView?.findViewById(R.id.switch_dark_theme)
+
+        setSupportActionBar(toolbar)
     }
 
 
     private fun drawerNavigationToggle() {
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this, drawerLayout, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
@@ -92,6 +107,7 @@ class MainActivity : AppCompatActivity() {
     private fun drawerNavigationItemSelectedListener() {
         navigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
+
                 R.id.nav_settings -> {
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, settingsFragment)
@@ -102,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                     closeDrawerLayout()
                     true
                 }
+
                 R.id.nav_gallery -> {
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, galleryFragment)
@@ -121,6 +138,7 @@ class MainActivity : AppCompatActivity() {
     private fun bottomNavigationItemSelectedListener() {
         bottomNavigation.setOnItemSelectedListener(NavigationBarView.OnItemSelectedListener { item: MenuItem ->
             when(item.itemId) {
+
                 R.id.portfolio -> {
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, portfolioFragment)
@@ -130,13 +148,14 @@ class MainActivity : AppCompatActivity() {
                     setToolbarTitle(portfolioFragment)
                     true
                 }
+
                 R.id.prices -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, portfolioFragment)
+                        replace(R.id.fragmentContainer, apiPricesFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    setToolbarTitle(portfolioFragment)
+                    setToolbarTitle(apiPricesFragment)
                     true
                 }
                 else -> false
@@ -174,6 +193,7 @@ class MainActivity : AppCompatActivity() {
             settingsFragment -> toolbar.title = getString(R.string.menu_settings)
             addNewItemFragment -> toolbar.title = getString(R.string.menu_add_new_item)
             galleryFragment -> toolbar.title = getString(R.string.menu_gallery)
+            apiPricesFragment -> toolbar.title = getString(R.string.menu_api_prices)
             else -> toolbar.title = getString(R.string.app_name)
         }
     }

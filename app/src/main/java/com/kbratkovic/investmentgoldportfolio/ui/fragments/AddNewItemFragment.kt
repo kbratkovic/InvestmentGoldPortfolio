@@ -1,4 +1,4 @@
-package com.kbratkovic.investmentgoldportfolio.ui.addNewItem
+package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,21 +8,17 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputEditText
-import com.kbratkovic.investmentgoldportfolio.MainActivity
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.Repository
-import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
-import com.kbratkovic.investmentgoldportfolio.database.InvestmentItem
-import com.kbratkovic.investmentgoldportfolio.ui.ViewModelProviderFactory
+import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 
 
 class AddNewItemFragment : Fragment() {
 
     private lateinit var itemName: TextInputEditText
     private lateinit var textView: TextView
-    private val mAddNewItemViewModel: AddNewItemViewModel by activityViewModels()
+    private val mMainViewModel: MainViewModel by activityViewModels()
 
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,20 +32,17 @@ class AddNewItemFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val view = inflater.inflate(R.layout.fragment_addnewitem, container, false)
-
-//        val repository = Repository(AppDatabase.getDatabase(requireContext().applicationContext))
+        //        val repository = Repository(AppDatabase.getDatabase(requireContext().applicationContext))
 //        val viewModelProviderFactory = ViewModelProviderFactory(repository)
 //        mAddNewItemViewModel = ViewModelProvider(this, viewModelProviderFactory).get(AddNewItemViewModel::class.java)
 
 //        mAddNewItemViewModel = ViewModelProvider(this)[AddNewItemViewModel::class.java]
 
 
-
 //        mAddNewItemViewModel.text.observe(viewLifecycleOwner) {
 //            textView.text = it
 //        }
-        return view
+        return inflater.inflate(R.layout.fragment_addnewitem, container, false)
 
 
     } // end onCreateView
@@ -57,9 +50,10 @@ class AddNewItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initializeLayoutViews(view)
 
-        val items: LiveData<List<InvestmentItem>> = mAddNewItemViewModel.allInvestmentItems
+        val items: LiveData<List<InvestmentItem>> = mMainViewModel.allInvestmentItems
     } // end onViewCreated
 
 
