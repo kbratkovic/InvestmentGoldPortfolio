@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         manageDarkModeSwitch()
 
 
+
     } // onCreate End
 
 

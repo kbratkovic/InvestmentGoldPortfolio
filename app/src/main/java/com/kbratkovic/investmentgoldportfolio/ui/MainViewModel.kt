@@ -33,7 +33,8 @@ class MainViewModel(
 //
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
-    private val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
+    val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
+
 
     fun getCurrentGoldPrice(symbol: String, currency: String) = viewModelScope.launch {
         currentGoldPrice.postValue(Resource.Loading())
