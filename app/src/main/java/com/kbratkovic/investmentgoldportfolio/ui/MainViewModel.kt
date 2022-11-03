@@ -1,5 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.ui
 
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
@@ -9,6 +10,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import timber.log.Timber
+import java.net.SocketTimeoutException
 
 //class AddNewItemViewModel(application: Application) : AndroidViewModel(application) {
 class MainViewModel(
@@ -31,20 +33,19 @@ class MainViewModel(
 //
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
-    private val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
+    val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
+
 
     fun getCurrentGoldPrice(symbol: String, currency: String) = viewModelScope.launch {
         currentGoldPrice.postValue(Resource.Loading())
-//        val response: Response<GoldPriceResponse>
-//        try {
-//            response = repository.getCurrentGoldPrice(symbol, currency)
-//        } catch (e: TimeoutCancellationException) {
-//            Timber.e(e.localizedMessage)
-//        }
 
-        val response = repository.getCurrentGoldPrice(symbol, currency)
+        try {
+            val response = repository.getCurrentGoldPrice(symbol, currency)
+            currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
+        } catch (e: SocketTimeoutException) {
+            Timber.e(e.localizedMessage)
+        }
 
-        currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
     }
 
     private fun handleCurrentGoldPriceResponse(response: Response<GoldPriceResponse>) : Resource<GoldPriceResponse> {

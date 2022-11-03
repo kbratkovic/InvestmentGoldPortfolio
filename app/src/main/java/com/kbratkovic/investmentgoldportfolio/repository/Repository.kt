@@ -17,7 +17,10 @@ class Repository(
 //        investmentItemDao.addInvestmentItem(item)
 //    }
 
-    suspend fun getCurrentGoldPrice(symbol: String, currency: String) = RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
+    suspend fun getCurrentGoldPrice(symbol: String, currency: String) : Response<GoldPriceResponse> {
+        val response = RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
+        return response
+    }
 
 
 }

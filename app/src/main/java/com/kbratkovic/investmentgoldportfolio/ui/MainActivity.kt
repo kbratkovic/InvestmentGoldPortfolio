@@ -15,16 +15,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
+import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
-import com.kbratkovic.investmentgoldportfolio.api.RetrofitInstance
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
-import com.kbratkovic.investmentgoldportfolio.ui.fragments.ApiPricesFragment
-import com.kbratkovic.investmentgoldportfolio.ui.fragments.GalleryFragment
-import com.kbratkovic.investmentgoldportfolio.ui.fragments.PortfolioFragment
-import com.kbratkovic.investmentgoldportfolio.ui.fragments.SettingsFragment
-import com.kbratkovic.investmentgoldportfolio.ui.fragments.AddNewItemFragment
+import com.kbratkovic.investmentgoldportfolio.ui.fragments.*
+import timber.log.Timber
+import timber.log.Timber.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -49,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initializeTimberLogging()
+
         setDefaultFragment()
         initializeViewModel()
         initializeViews()
@@ -59,7 +60,15 @@ class MainActivity : AppCompatActivity() {
         manageDarkModeSwitch()
 
 
+
     } // onCreate End
+
+
+    private fun initializeTimberLogging() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
+    }
 
 
     private fun setDefaultFragment() {
