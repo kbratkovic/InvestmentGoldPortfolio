@@ -10,11 +10,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.timepicker.TimeFormat
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import timber.log.Timber
+import java.text.DateFormat
 import java.util.*
 
 
@@ -26,6 +29,7 @@ class ApiPricesFragment : Fragment() {
     private lateinit var textViewMetalPrice: TextView
     private lateinit var dropdownMenuMetal: TextInputLayout
     private lateinit var dropdownMenuCurrency: TextInputLayout
+    private lateinit var linearProgressIndicator: LinearProgressIndicator
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -53,6 +57,7 @@ class ApiPricesFragment : Fragment() {
         initializeLayoutViews(view)
 
         mMainViewModel.getCurrentGoldPrice("XAU", "EUR")
+        showProgressBar()
 
 //        val currentGoldPriceObserver = Observer<Resource<GoldPriceResponse>> {
 //            symbol.text = it.data?.symbol
@@ -63,9 +68,14 @@ class ApiPricesFragment : Fragment() {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { goldPriceResponse ->
-                        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd, HH:mm:ss")
                         val date = Date(goldPriceResponse.timestamp.toLong() * 1000)
-                        textViewTimeAndDate.text = getString(R.string.time_and_date, sdf.format(date))
+                        val dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
+                        val dateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, TimeFormat.CLOCK_12H)
+                        val formattedDate = dateTimeFormat.format(date)
+
+//                        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd, HH:mm:ss")
+//                        val date = Date(goldPriceResponse.timestamp.toLong() * 1000)
+                        textViewTimeAndDate.text = getString(R.string.time_and_date, formattedDate)
 //                        textViewMetal.text = getString(R.string.metal, goldPriceResponse.metal)
 //                        textViewCurrency.text = getString(R.string.currency, goldPriceResponse.currency)
                         textViewMetalPrice.text = goldPriceResponse.price.toString()
@@ -89,7 +99,12 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun hideProgressBar() {
+        linearProgressIndicator.visibility = View.INVISIBLE
+    }
 
+
+    private fun showProgressBar() {
+        linearProgressIndicator.visibility = View.VISIBLE
     }
 
     override fun onResume() {
@@ -104,6 +119,7 @@ class ApiPricesFragment : Fragment() {
         dropdownMenuMetal = view.findViewById(R.id.menu_metal)
         dropdownMenuCurrency = view.findViewById(R.id.menu_currency)
         textViewMetalPrice = view.findViewById(R.id.metal_price)
+        linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
     }
 
 
