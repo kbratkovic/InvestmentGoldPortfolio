@@ -1,11 +1,12 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -33,6 +34,8 @@ class ApiPricesFragment : Fragment() {
     private lateinit var textViewMetalLowPrice: TextView
     private lateinit var dropdownMenuMetal: TextInputLayout
     private lateinit var dropdownMenuCurrency: TextInputLayout
+    private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
+    private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
     private lateinit var linearProgressIndicator: LinearProgressIndicator
     private lateinit var pricesContainer: ConstraintLayout
 
@@ -61,7 +64,13 @@ class ApiPricesFragment : Fragment() {
 
         initializeLayoutViews(view)
         startOnDataChangeListener()
-        mMainViewModel.getCurrentGoldPrice("XAU", "EUR")
+
+        autoCompleteTextViewMetal.setOnItemClickListener{ adapterView, view, i, l ->
+            Toast.makeText(requireContext(), "Item selected", Toast.LENGTH_SHORT).show()
+        }
+
+
+        mMainViewModel.getCurrentGoldPrice("XAU", "USD")
 
 
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner, Observer { response ->
@@ -98,7 +107,9 @@ class ApiPricesFragment : Fragment() {
     private fun startOnDataChangeListener() {
         mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
             override fun onDataChanged(message: String?) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                if (message.equals(getString(R.string.network_error))) {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
                 hideProgressBar()
             }
         })
@@ -130,6 +141,8 @@ class ApiPricesFragment : Fragment() {
 //        textViewMetal = view.findViewById(R.id.metal)
 //        textViewCurrency = view.findViewById(R.id.currency)
         dropdownMenuMetal = view.findViewById(R.id.menu_metal)
+        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
+        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
         dropdownMenuCurrency = view.findViewById(R.id.menu_currency)
         textViewMetalHighPrice = view.findViewById(R.id.metal_high_price)
         textViewMetalCurrentPrice = view.findViewById(R.id.metal_current_price)
