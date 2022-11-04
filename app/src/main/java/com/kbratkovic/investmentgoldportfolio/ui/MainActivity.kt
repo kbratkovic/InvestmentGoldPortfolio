@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeViewModel() {
         val repository = Repository(AppDatabase.getDatabase(this))
-        val viewModelProviderFactory = ViewModelProviderFactory(repository)
+        val viewModelProviderFactory = ViewModelProviderFactory(repository, application)
         mMainViewModel = ViewModelProvider(this, viewModelProviderFactory)[MainViewModel::class.java]
     }
 

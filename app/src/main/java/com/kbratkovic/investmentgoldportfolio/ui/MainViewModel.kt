@@ -1,36 +1,35 @@
 package com.kbratkovic.investmentgoldportfolio.ui
 
+import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
+import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
 import com.kbratkovic.investmentgoldportfolio.util.Resource
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import timber.log.Timber
 import java.net.SocketTimeoutException
 
-//class AddNewItemViewModel(application: Application) : AndroidViewModel(application) {
+
 class MainViewModel(
-    private val repository: Repository
-) : ViewModel() {
+    private val repository: Repository,
+    private val context: Application
+) : AndroidViewModel(context) {
 
-    // OK RADI
-//    init {
-//        val investmentItemDao = AppDatabase.getDatabase(application).investmentItemDao()
-//        val a  = 5
-//        var b = a + 4
-//    }
+    private var mOnDataChangeListener: OnDataChangeListener? = null
 
-//    private val repository: Repository = Repository(AppDatabase.getDatabase().investmentDao())
-//
-//    private val _text = MutableLiveData<String>().apply {
-//        value = "This is AddNewItem Fragment"
-//    }
-//    val text: LiveData<String> = _text
-//
+    fun setOnDataChangeListener(onDataChangeListener: OnDataChangeListener) {
+        mOnDataChangeListener = onDataChangeListener
+    }
+
+    interface OnDataChangeListener {
+        fun onDataChanged(message: String?)
+    }
+
+
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
     val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
@@ -44,6 +43,7 @@ class MainViewModel(
             currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
         } catch (e: SocketTimeoutException) {
             Timber.e(e.localizedMessage)
+            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
         }
 
     }
