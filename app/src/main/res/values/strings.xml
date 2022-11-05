@@ -19,7 +19,7 @@
     <string name="description_metal_prices">Metal prices</string>
     <string name="title_dark_theme">Dark theme</string>
 
-    <string name="time_and_date">Last updated: %1$s</string>
+    <string name="time_and_date">%1$s</string>
     <string name="metal">Metal</string>
     <string name="currency">Currency</string>
 
@@ -28,5 +28,7 @@
 
     <string name="currency_usd">USD</string>
     <string name="currency_eur">EUR</string>
+
+    <string name="network_error">Network error, please try again later!</string>
 
 </resources>

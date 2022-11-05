@@ -20,8 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:gravity="start"
-        android:textSize="16sp"
+        android:layout_marginStart="5dp"
+        android:gravity="center"
+        android:textSize="18sp"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="106dp" />
 
@@ -37,6 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/time_and_date">
 
         <AutoCompleteTextView
+            android:id="@+id/auto_complete_text_view_metal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
@@ -59,6 +61,7 @@
         app:layout_constraintTop_toBottomOf="@+id/time_and_date">
 
         <AutoCompleteTextView
+            android:id="@+id/auto_complete_text_view_currency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
@@ -69,18 +72,61 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/metal_price"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/prices_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="start"
-        android:textSize="16sp"
-        android:text="PRICE"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/menu_metal"
+        android:layout_marginBottom="50dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_metal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/metal_high_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_price"
+                android:gravity="start"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="10dp"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/metal_current_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_current_price"
+                android:elevation="2dp"
+                android:gravity="start"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="10dp"
+                android:textSize="50sp" />
+
+            <TextView
+                android:id="@+id/metal_low_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_price"
+                android:gravity="start"
+                android:paddingHorizontal="30dp"
+                android:paddingVertical="10dp"
+                android:textSize="30sp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
