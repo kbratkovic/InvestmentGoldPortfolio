@@ -70,10 +70,10 @@ class ApiPricesFragment : Fragment() {
         initializeLayoutViews(view)
         startOnDataChangeListener()
 
-        manageDropDownMenus()
+//        manageDropDownMenus()
 
 
-        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
+//        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
 
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner, Observer { response ->
             when(response) {
@@ -213,9 +213,17 @@ class ApiPricesFragment : Fragment() {
     }
 
 
+    private fun setDefaultValueInDropDownMenuCurrency() {
+        autoCompleteTextViewCurrency.setText(CURRENCY_USD_CODE, false)
+    }
+
+
     override fun onResume() {
         super.onResume()
         hidePrices()
+        manageDropDownMenus()
+        setDefaultValueInDropDownMenuCurrency()
+        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
     }
 
 }
