@@ -24,6 +24,8 @@
         android:gravity="center"
         android:textSize="18sp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteX="106dp" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -42,9 +44,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            android:labelFor="@+id/adsa"
             android:text="@string/metal_gold"
-            app:simpleItems="@array/metal_items"
+            android:hint="@string/metal"
             tools:ignore="TouchTargetSizeCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -65,40 +66,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            android:labelFor="@+id/adsa"
             android:text="@string/currency_usd"
-            app:simpleItems="@array/currency_items"
+            android:hint="@string/currency"
             tools:ignore="TouchTargetSizeCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/prices_container"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="500dp"
+        android:background="@drawable/layout_round_corners"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/menu_metal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/menu_metal">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/prices_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
+            android:orientation="vertical">
             <TextView
                 android:id="@+id/metal_high_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rectangle_price"
                 android:gravity="start"
+                android:textColor="@color/high_price"
+                android:text="price"
                 android:paddingHorizontal="30dp"
                 android:paddingVertical="10dp"
                 android:textSize="30sp" />
@@ -107,9 +104,12 @@
                 android:id="@+id/metal_current_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rectangle_current_price"
-                android:elevation="2dp"
+                android:elevation="4dp"
                 android:gravity="start"
+                android:text="price"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
                 android:paddingHorizontal="30dp"
                 android:paddingVertical="10dp"
                 android:textSize="50sp" />
@@ -118,15 +118,14 @@
                 android:id="@+id/metal_low_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rectangle_price"
                 android:gravity="start"
+                android:textColor="@color/low_price"
+                android:text="price"
                 android:paddingHorizontal="30dp"
                 android:paddingVertical="10dp"
                 android:textSize="30sp" />
-
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

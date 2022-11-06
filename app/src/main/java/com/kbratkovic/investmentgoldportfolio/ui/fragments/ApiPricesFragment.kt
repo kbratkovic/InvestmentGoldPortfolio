@@ -5,11 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.AutoCompleteTextView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -21,6 +17,7 @@ import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import timber.log.Timber
 import java.text.DateFormat
+import java.text.NumberFormat
 import java.util.*
 
 
@@ -37,7 +34,10 @@ class ApiPricesFragment : Fragment() {
     private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
     private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
     private lateinit var linearProgressIndicator: LinearProgressIndicator
-    private lateinit var pricesContainer: ConstraintLayout
+    private lateinit var pricesContainer: LinearLayout
+
+    private lateinit var selectedMetal: String
+    private lateinit var selectedCurrency: String
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -62,16 +62,16 @@ class ApiPricesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val currencyFormatUSD = NumberFormat.getCurrencyInstance(Locale.US)
+        val currencyFormatEUR = NumberFormat.getCurrencyInstance(Locale.GERMAN)
+
         initializeLayoutViews(view)
         startOnDataChangeListener()
 
-        autoCompleteTextViewMetal.setOnItemClickListener{ adapterView, view, i, l ->
-            Toast.makeText(requireContext(), "Item selected", Toast.LENGTH_SHORT).show()
-        }
+        manageDropDownMenus()
 
 
         mMainViewModel.getCurrentGoldPrice("XAU", "USD")
-
 
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner, Observer { response ->
             when(response) {
@@ -80,11 +80,9 @@ class ApiPricesFragment : Fragment() {
                     response.data?.let { goldPriceResponse ->
                         showPrices()
                         textViewTimeAndDate.text = getString(R.string.time_and_date, formatDateAndTime(goldPriceResponse))
-//                        textViewMetal.text = getString(R.string.metal, goldPriceResponse.metal)
-//                        textViewCurrency.text = getString(R.string.currency, goldPriceResponse.currency)
-                        textViewMetalHighPrice.text = goldPriceResponse.high_price.toString()
-                        textViewMetalCurrentPrice.text = goldPriceResponse.price.toString()
-                        textViewMetalLowPrice.text = goldPriceResponse.low_price.toString()
+                        textViewMetalHighPrice.text = currencyFormatUSD.format(goldPriceResponse.high_price)
+                        textViewMetalCurrentPrice.text = currencyFormatUSD.format(goldPriceResponse.price)
+                        textViewMetalLowPrice.text = currencyFormatUSD.format(goldPriceResponse.low_price)
                     }
                 }
                 is Resource.Error -> {
@@ -102,6 +100,22 @@ class ApiPricesFragment : Fragment() {
         })
 
     } // onViewCreated
+
+
+    private fun initializeLayoutViews(view: View) {
+        textViewTimeAndDate = view.findViewById(R.id.time_and_date)
+//        textViewMetal = view.findViewById(R.id.metal)
+//        textViewCurrency = view.findViewById(R.id.currency)
+        dropdownMenuMetal = view.findViewById(R.id.menu_metal)
+        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
+        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
+        dropdownMenuCurrency = view.findViewById(R.id.menu_currency)
+        textViewMetalHighPrice = view.findViewById(R.id.metal_high_price)
+        textViewMetalCurrentPrice = view.findViewById(R.id.metal_current_price)
+        textViewMetalLowPrice = view.findViewById(R.id.metal_low_price)
+        linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
+        pricesContainer = view.findViewById(R.id.prices_container)
+    }
 
 
     private fun startOnDataChangeListener() {
@@ -126,6 +140,34 @@ class ApiPricesFragment : Fragment() {
     }
 
 
+    private fun manageDropDownMenus() {
+        val metalList = listOf("Gold")
+        val currencyList = listOf("USD", "EUR")
+
+        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalList)
+        autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
+
+        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyList)
+        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
+
+        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener{
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 >= 0) {
+                    selectedMetal = p0?.getItemAtPosition(p2) as String
+                }
+            }
+        }
+
+        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener{
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 >= 0) {
+                    selectedCurrency = p0?.getItemAtPosition(p2) as String
+                }
+            }
+        }
+    }
+
+
     private fun hideProgressBar() {
         linearProgressIndicator.visibility = View.INVISIBLE
     }
@@ -133,24 +175,6 @@ class ApiPricesFragment : Fragment() {
 
     private fun showProgressBar() {
         linearProgressIndicator.visibility = View.VISIBLE
-    }
-
-
-    private fun initializeLayoutViews(view: View) {
-        textViewTimeAndDate = view.findViewById(R.id.time_and_date)
-//        textViewMetal = view.findViewById(R.id.metal)
-//        textViewCurrency = view.findViewById(R.id.currency)
-        dropdownMenuMetal = view.findViewById(R.id.menu_metal)
-        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
-        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
-        dropdownMenuCurrency = view.findViewById(R.id.menu_currency)
-        textViewMetalHighPrice = view.findViewById(R.id.metal_high_price)
-        textViewMetalCurrentPrice = view.findViewById(R.id.metal_current_price)
-        textViewMetalLowPrice = view.findViewById(R.id.metal_low_price)
-        linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
-        pricesContainer = view.findViewById(R.id.prices_container)
-
-        hidePrices()
     }
 
 
@@ -166,7 +190,7 @@ class ApiPricesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        hidePrices()
     }
 
 }

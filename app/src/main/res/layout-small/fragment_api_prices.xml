@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.ApiPricesFragment">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/linear_progress_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/time_and_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="5dp"
+        android:gravity="center"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteX="106dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menu_metal"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="20dp"
+        android:hint="@string/metal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_and_date">
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_complete_text_view_metal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:text="@string/metal_gold"
+            android:hint="@string/metal"
+            app:simpleItems="@array/metal_items"
+            tools:ignore="TouchTargetSizeCheck" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menu_currency"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:hint="@string/currency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_and_date">
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_complete_text_view_currency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:text="@string/currency_usd"
+            android:hint="@string/currency"
+            app:simpleItems="@array/currency_items"
+            tools:ignore="TouchTargetSizeCheck" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:id="@+id/prices_container"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:background="@drawable/layout_round_corners"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/metal_high_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_price"
+            android:gravity="start"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/metal_current_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_current_price"
+            android:elevation="2dp"
+            android:gravity="start"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp"
+            android:textSize="50sp" />
+
+        <TextView
+            android:id="@+id/metal_low_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_price"
+            android:gravity="start"
+            android:paddingHorizontal="30dp"
+            android:paddingVertical="10dp"
+            android:textSize="30sp" />
+
+    </LinearLayout>
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/prices_container"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginBottom="50dp"-->
+    <!--        android:visibility="invisible"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/menu_metal">-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:gravity="center"-->
+    <!--            android:orientation="vertical"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent">-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/metal_high_price"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:background="@drawable/rectangle_price"-->
+    <!--                android:gravity="start"-->
+    <!--                android:paddingHorizontal="30dp"-->
+    <!--                android:paddingVertical="10dp"-->
+    <!--                android:textSize="30sp" />-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/metal_current_price"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:background="@drawable/rectangle_current_price"-->
+    <!--                android:elevation="2dp"-->
+    <!--                android:gravity="start"-->
+    <!--                android:paddingHorizontal="30dp"-->
+    <!--                android:paddingVertical="10dp"-->
+    <!--                android:textSize="50sp" />-->
+
+    <!--            <TextView-->
+    <!--                android:id="@+id/metal_low_price"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:background="@drawable/rectangle_price"-->
+    <!--                android:gravity="start"-->
+    <!--                android:paddingHorizontal="30dp"-->
+    <!--                android:paddingVertical="10dp"-->
+    <!--                android:textSize="30sp" />-->
+
+    <!--        </LinearLayout>-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
