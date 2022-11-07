@@ -22,6 +22,7 @@
     <string name="time_and_date">%1$s</string>
     <string name="metal">Metal</string>
     <string name="currency">Currency</string>
+    <string name="weight">Weight</string>
 
     <string name="metal_gold">Gold</string>
     <string name="metal_silver">Silver</string>
@@ -29,6 +30,10 @@
     <string name="currency_usd">USD</string>
     <string name="currency_eur">EUR</string>
 
+    <string name="weight_gram">gram</string>
+    <string name="weight_troy_ounce">troy ounce</string>
+
     <string name="network_error">Network error, please try again later!</string>
+    <string name="enter_item_name">Enter Item Name</string>
 
 </resources>

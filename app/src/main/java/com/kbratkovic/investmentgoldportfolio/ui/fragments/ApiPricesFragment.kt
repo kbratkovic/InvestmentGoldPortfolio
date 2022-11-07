@@ -14,7 +14,6 @@ import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
-import com.kbratkovic.investmentgoldportfolio.util.Constants
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
@@ -66,14 +65,9 @@ class ApiPricesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         initializeLayoutViews(view)
         startOnDataChangeListener()
 
-//        manageDropDownMenus()
-
-
-//        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
 
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner, Observer { response ->
             when(response) {
@@ -145,16 +139,16 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun manageDropDownMenus() {
-        val metalList = listOf("Gold")
-        val currencyList = listOf("USD", "EUR")
+        val metalDropdownList = resources.getStringArray(R.array.metal_items)
+        val currencyDropdownList = resources.getStringArray(R.array.currency_items)
 
-        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalList)
+        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalDropdownList)
         autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
 
-        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyList)
+        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
         autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener{
+        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
                     selectedMetal = p0?.getItemAtPosition(p2) as String
@@ -162,7 +156,7 @@ class ApiPricesFragment : Fragment() {
             }
         }
 
-        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener{
+        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
                     selectedCurrency = p0?.getItemAtPosition(p2) as String
@@ -178,18 +172,18 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun displayPricesInUSD(goldPriceResponse: GoldPriceResponse) {
-        val currencyFormatUSD = NumberFormat.getCurrencyInstance(Locale.US)
-        textViewMetalHighPrice.text = currencyFormatUSD.format(goldPriceResponse.high_price)
-        textViewMetalCurrentPrice.text = currencyFormatUSD.format(goldPriceResponse.price)
-        textViewMetalLowPrice.text = currencyFormatUSD.format(goldPriceResponse.low_price)
+        val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
+        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price)
+        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price)
+        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price)
     }
 
 
     private fun displayPricesInEUR(goldPriceResponse: GoldPriceResponse) {
-        val currencyFormatEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
-        textViewMetalHighPrice.text = currencyFormatEUR.format(goldPriceResponse.high_price)
-        textViewMetalCurrentPrice.text = currencyFormatEUR.format(goldPriceResponse.price)
-        textViewMetalLowPrice.text = currencyFormatEUR.format(goldPriceResponse.low_price)
+        val localeGermany = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+        textViewMetalHighPrice.text = localeGermany.format(goldPriceResponse.high_price)
+        textViewMetalCurrentPrice.text = localeGermany.format(goldPriceResponse.price)
+        textViewMetalLowPrice.text = localeGermany.format(goldPriceResponse.low_price)
     }
 
 
