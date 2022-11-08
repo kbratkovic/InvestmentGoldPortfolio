@@ -2,6 +2,7 @@ package com.kbratkovic.investmentgoldportfolio.ui
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -145,8 +146,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun bottomNavigationItemSelectedListener() {
-        bottomNavigation.setOnItemSelectedListener(NavigationBarView.OnItemSelectedListener { item: MenuItem ->
-            when(item.itemId) {
+        bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
+            when (item.itemId) {
 
                 R.id.portfolio -> {
                     supportFragmentManager.beginTransaction().apply {
@@ -154,6 +155,7 @@ class MainActivity : AppCompatActivity() {
                         addToBackStack(null)
                         commit()
                     }
+                    fab.visibility = View.VISIBLE
                     setToolbarTitle(portfolioFragment)
                     true
                 }
@@ -164,12 +166,13 @@ class MainActivity : AppCompatActivity() {
                         addToBackStack(null)
                         commit()
                     }
+                    fab.visibility = View.VISIBLE
                     setToolbarTitle(apiPricesFragment)
                     true
                 }
                 else -> false
             }
-        })
+        }
     }
 
 

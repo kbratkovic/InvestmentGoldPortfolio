@@ -27,8 +27,6 @@ import java.util.*
 class ApiPricesFragment : Fragment() {
 
     private lateinit var textViewTimeAndDate: TextView
-    private lateinit var textViewMetal: TextView
-    private lateinit var textViewCurrency: TextView
     private lateinit var textViewMetalHighPrice: TextView
     private lateinit var textViewMetalCurrentPrice: TextView
     private lateinit var textViewMetalLowPrice: TextView
@@ -53,7 +51,8 @@ class ApiPricesFragment : Fragment() {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
@@ -69,13 +68,14 @@ class ApiPricesFragment : Fragment() {
         startOnDataChangeListener()
 
 
-        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner, Observer { response ->
-            when(response) {
+        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
+            when (response) {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { goldPriceResponse ->
                         showPrices()
-                        textViewTimeAndDate.text = getString(R.string.time_and_date, formatDateAndTime(goldPriceResponse))
+                        textViewTimeAndDate.text =
+                            getString(R.string.time_and_date, formatDateAndTime(goldPriceResponse))
                         when (goldPriceResponse.currency) {
                             CURRENCY_USD_CODE -> displayPricesInUSD(goldPriceResponse)
                             CURRENCY_EUR_CODE -> displayPricesInEUR(goldPriceResponse)
@@ -94,7 +94,7 @@ class ApiPricesFragment : Fragment() {
                     showProgressBar()
                 }
             }
-        })
+        }
 
     } // onViewCreated
 

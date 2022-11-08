@@ -23,6 +23,8 @@
     <string name="metal">Metal</string>
     <string name="currency">Currency</string>
     <string name="weight">Weight</string>
+    <string name="items_purchased">Units Purchased</string>
+    <string name="item_price">Unit Price</string>
 
     <string name="metal_gold">Gold</string>
     <string name="metal_silver">Silver</string>
@@ -35,5 +37,6 @@
 
     <string name="network_error">Network error, please try again later!</string>
     <string name="enter_item_name">Enter Item Name</string>
+    <string name="button_save">Save</string>
 
 </resources>
