@@ -54,14 +54,19 @@ class MainViewModel(
                 return Resource.Success(resultResponse)
             }
         }
-        return  Resource.Error(response.message())
+        return Resource.Error(response.message())
     }
 
 
-//    fun addInvestmentItem(item: InvestmentItem) {
-//        viewModelScope.launch {
-//            repository.addInvestmentItem(item)
-//        }
-//    }
+    fun addInvestmentItem(item: InvestmentItem) =  viewModelScope.launch {
+            repository.addInvestmentItem(item)
+        }
+
+    private fun handleAddInvestmentItem(response: Response<GoldPriceResponse>) : Resource<GoldPriceResponse> {
+        if (response.isSuccessful) {
+
+        }
+        return Resource.Error(response.message())
+    }
 
 }

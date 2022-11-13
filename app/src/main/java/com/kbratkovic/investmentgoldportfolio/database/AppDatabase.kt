@@ -27,22 +27,12 @@ abstract class AppDatabase : RoomDatabase() {
 //                "portfolio_db.db"
 //            ).build()
 //    }
+
+
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-//        fun getDatabase(context: Context): AppDatabase {
-//            return INSTANCE ?: synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    AppDatabase::class.java,
-//                    "app_database"
-//                ).build()
-//                INSTANCE = instance
-////                 return instance
-//                instance
-//            }
-//        }
         fun getDatabase(context: Context) : AppDatabase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
@@ -59,6 +49,19 @@ abstract class AppDatabase : RoomDatabase() {
                 return instance
             }
         }
+
+        //        fun getDatabase(context: Context): AppDatabase {
+//            return INSTANCE ?: synchronized(this) {
+//                val instance = Room.databaseBuilder(
+//                    context.applicationContext,
+//                    AppDatabase::class.java,
+//                    "app_database"
+//                ).build()
+//                INSTANCE = instance
+////                 return instance
+//                instance
+//            }
+//        }
     }
 
 }

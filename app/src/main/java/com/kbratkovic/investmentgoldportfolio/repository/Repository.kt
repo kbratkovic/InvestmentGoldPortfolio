@@ -8,19 +8,17 @@ import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import retrofit2.Response
 
 class Repository(
-    db: AppDatabase
+    private val db: AppDatabase
 ) {
 
-    val getAllInvestmentItems: LiveData<List<InvestmentItem>> = db.investmentItemDao().getAllInvestmentItems()
-//
-//    suspend fun addInvestmentItem(item: InvestmentItem) {
-//        investmentItemDao.addInvestmentItem(item)
-//    }
+    val getAllInvestmentItems: LiveData<List<InvestmentItem>> =
+        db.investmentItemDao().getAllInvestmentItems()
 
-    suspend fun getCurrentGoldPrice(symbol: String, currency: String) : Response<GoldPriceResponse> {
-        val response = RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
-        return response
-    }
+    suspend fun addInvestmentItem(item: InvestmentItem) =
+        db.investmentItemDao().addInvestmentItem(item)
 
+
+    suspend fun getCurrentGoldPrice(symbol: String, currency: String) =
+        RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
 
 }

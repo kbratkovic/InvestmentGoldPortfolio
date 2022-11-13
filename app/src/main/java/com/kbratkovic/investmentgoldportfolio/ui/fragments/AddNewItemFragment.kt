@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
@@ -68,13 +71,13 @@ class AddNewItemFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val fab = activity?.findViewById<FloatingActionButton>(R.id.fab)
-        fab?.visibility = View.GONE
+//        val bottomNavigation = activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)
+//        bottomNavigation?.menu?.setGroupCheckable(0, false, true)
+//        fab?.visibility = View.GONE
 
         initializeLayoutViews(view)
         manageDropDownMenus()
-
         manageButtonSave()
-
 
 
     } // end onViewCreated
@@ -100,8 +103,9 @@ class AddNewItemFragment : Fragment() {
     }
 
     private fun saveInvestmentItem(item: InvestmentItem) {
-
+        mMainViewModel.addInvestmentItem(item)
     }
+
 
     private fun checkIfAllDataIsEntered(): Boolean {
         if (TextUtils.isEmpty(editTextItemName.text.toString()) || TextUtils.isEmpty(editTextWeight.text.toString()) ||

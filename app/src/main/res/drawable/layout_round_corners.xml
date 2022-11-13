@@ -13,7 +13,7 @@
         android:right="10dp"
         android:bottom="0dp" />
     <gradient
-        android:startColor="@color/purple_500"
+        android:startColor="@color/purple_700"
         android:endColor="@color/teal_200"
         android:angle="@integer/material_motion_duration_long_1"/>
 </shape>

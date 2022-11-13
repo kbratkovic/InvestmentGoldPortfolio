@@ -10,7 +10,7 @@ import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 @Dao
 interface InvestmentItemDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addInvestmentItem(item: InvestmentItem)
 
     @Query("SELECT * FROM investment_item ORDER BY id ASC")

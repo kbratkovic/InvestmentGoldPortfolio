@@ -38,5 +38,6 @@
     <string name="network_error">Network error, please try again later!</string>
     <string name="enter_item_name">Enter Item Name</string>
     <string name="button_save">Save</string>
+    <string name="zero_value">0</string>
 
 </resources>
