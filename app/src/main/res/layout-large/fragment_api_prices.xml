@@ -46,6 +46,7 @@
             android:hint="@string/metal"
             android:inputType="none"
             android:text="@string/metal_gold"
+            android:textSize="26sp"
             tools:ignore="TouchTargetSizeCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -68,11 +69,12 @@
             android:hint="@string/currency"
             android:inputType="none"
             android:text="@string/currency_usd"
+            android:textSize="26sp"
             tools:ignore="TouchTargetSizeCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/layout_round_corners"
@@ -81,18 +83,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline2">
+        app:layout_constraintTop_toBottomOf="@+id/guideline3">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/prices_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/metal_high_price"
@@ -103,11 +101,7 @@
                 android:paddingVertical="10dp"
                 android:text="price"
                 android:textColor="@color/high_price"
-                android:textSize="30sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/metal_current_price"/>
+                android:textSize="60sp" />
 
             <TextView
                 android:id="@+id/metal_current_price"
@@ -120,12 +114,8 @@
                 android:paddingVertical="10dp"
                 android:text="price"
                 android:textColor="@color/white"
-                android:textSize="50sp"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/metal_high_price"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/metal_low_price"/>
+                android:textSize="80sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/metal_low_price"
@@ -136,20 +126,16 @@
                 android:paddingVertical="10dp"
                 android:text="price"
                 android:textColor="@color/low_price"
-                android:textSize="30sp"
-                app:layout_constraintTop_toBottomOf="@+id/metal_current_price"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:textSize="60sp" />
+        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
+        android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="182dp" />
+        app:layout_constraintGuide_begin="232dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

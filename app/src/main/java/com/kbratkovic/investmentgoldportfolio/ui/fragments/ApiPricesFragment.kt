@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -34,7 +35,7 @@ class ApiPricesFragment : Fragment() {
     private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
     private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
     private lateinit var linearProgressIndicator: LinearProgressIndicator
-    private lateinit var pricesContainer: LinearLayout
+    private lateinit var pricesContainer: ConstraintLayout
 
     private lateinit var selectedMetal: String
     private lateinit var selectedCurrency: String

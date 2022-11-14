@@ -147,7 +147,6 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
 
                 R.id.portfolio -> {
-                    bottomNavigation.menu.findItem(R.id.portfolio).isChecked = true
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, portfolioFragment)
                         addToBackStack(null)
@@ -158,7 +157,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.add_new_item -> {
-                    bottomNavigation.menu.findItem(R.id.add_new_item).isChecked = true
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, addNewItemFragment)
                         addToBackStack(null)
@@ -169,7 +167,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.prices -> {
-                    bottomNavigation.menu.findItem(R.id.prices).isChecked = true
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, apiPricesFragment)
                         addToBackStack(null)
@@ -225,8 +222,5 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun uncheckAllBottomNavItems() {
-        bottomNavigation.menu.setGroupCheckable(0, false, true)
-    }
 
 }
