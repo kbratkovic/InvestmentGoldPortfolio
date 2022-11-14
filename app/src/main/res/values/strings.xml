@@ -14,8 +14,10 @@
     <string name="menu_api_prices">Gold Prices</string>
     <string name="add_new_nugget_to_portfolio">Add new nugget to portfolio</string>
     <string name="title_portfolio">Portfolio</string>
+    <string name="title_add">Add</string>
     <string name="title_prices">Prices</string>
     <string name="description_my_portfolio">My portfolio</string>
+    <string name="description_add_new_item">Add new item</string>
     <string name="description_metal_prices">Metal prices</string>
     <string name="title_dark_theme">Dark theme</string>
 

@@ -3,6 +3,7 @@ package com.kbratkovic.investmentgoldportfolio.ui
 import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
+import com.google.android.material.snackbar.Snackbar
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
@@ -59,14 +60,14 @@ class MainViewModel(
 
 
     fun addInvestmentItem(item: InvestmentItem) =  viewModelScope.launch {
+        try {
             repository.addInvestmentItem(item)
+            Toast.makeText(context, "Item saved successfully",Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Save error!",Toast.LENGTH_SHORT).show()
         }
 
-    private fun handleAddInvestmentItem(response: Response<GoldPriceResponse>) : Resource<GoldPriceResponse> {
-        if (response.isSuccessful) {
-
-        }
-        return Resource.Error(response.message())
     }
+
 
 }

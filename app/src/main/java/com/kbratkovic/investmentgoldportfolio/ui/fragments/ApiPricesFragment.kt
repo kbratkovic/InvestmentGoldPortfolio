@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
@@ -138,7 +137,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun manageDropDownMenus() {
+    private fun handleDropDownMenus() {
         val metalDropdownList = resources.getStringArray(R.array.metal_items)
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
 
@@ -215,7 +214,7 @@ class ApiPricesFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         hidePrices()
-        manageDropDownMenus()
+        handleDropDownMenus()
         setDefaultValueInDropDownMenuCurrency()
         mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
     }

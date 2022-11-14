@@ -8,15 +8,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
+import com.kbratkovic.investmentgoldportfolio.util.Utils
 
 
 class AddNewItemFragment : Fragment() {
@@ -26,7 +23,7 @@ class AddNewItemFragment : Fragment() {
 
     private lateinit var editTextItemName: EditText
     private lateinit var editTextWeight: EditText
-    private lateinit var editTextItemsPurchased: EditText
+    private lateinit var editTextUnitsPurchased: EditText
     private lateinit var editTextItemPrice: EditText
 
     private lateinit var menuCurrency: TextInputLayout
@@ -70,21 +67,39 @@ class AddNewItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val fab = activity?.findViewById<FloatingActionButton>(R.id.fab)
-//        val bottomNavigation = activity?.findViewById<BottomNavigationView>(R.id.bottom_navigation)
-//        bottomNavigation?.menu?.setGroupCheckable(0, false, true)
-//        fab?.visibility = View.GONE
-
         initializeLayoutViews(view)
-        manageDropDownMenus()
-        manageButtonSave()
+        handleDropDownMenus()
+        handleButtonSave(view)
+        handleEditTextFocusListeners()
+
 
 
     } // end onViewCreated
 
 
 
-    private fun manageButtonSave() {
+    private fun handleEditTextFocusListeners() {
+        editTextItemName.requestFocus()
+        editTextItemName.setOnFocusChangeListener { view, b ->
+            if (!TextUtils.isEmpty(editTextItemName.text.toString()))
+                editTextUnitsPurchased.setText("1")
+        }
+
+        editTextWeight.setOnFocusChangeListener { view, b ->
+            Utils.editTextSelectAll(view as EditText)
+        }
+
+        editTextUnitsPurchased.setOnFocusChangeListener { v, hasFocus ->
+            Utils.editTextSelectAll(v as EditText)
+        }
+
+        editTextItemPrice.setOnFocusChangeListener { v, hasFocus ->
+            Utils.editTextSelectAll(v as EditText)
+        }
+    }
+
+
+    private fun handleButtonSave(view: View) {
         buttonSave.setOnClickListener {
             if (!checkIfAllDataIsEntered()) {
                 Toast.makeText(requireContext(), "Not all data is entered!", Toast.LENGTH_SHORT).show()
@@ -95,27 +110,37 @@ class AddNewItemFragment : Fragment() {
             investmentItem.currency = selectedCurrency
             investmentItem.name = editTextItemName.text.toString().trim()
             investmentItem.weight = editTextWeight.text.toString().trim()
-            investmentItem.numberOfUnitsPurchased = editTextItemsPurchased.text.toString().toInt()
+            investmentItem.numberOfUnitsPurchased = editTextUnitsPurchased.text.toString().toInt()
             investmentItem.purchasePricePerUnit = editTextItemPrice.text.toString().toDouble()
 
             saveInvestmentItem(investmentItem)
         }
     }
 
+
     private fun saveInvestmentItem(item: InvestmentItem) {
         mMainViewModel.addInvestmentItem(item)
+        clearInputFields()
     }
 
 
+    private fun clearInputFields() {
+        editTextItemName.text.clear()
+        editTextItemName.requestFocus()
+        editTextWeight.setText(getString(R.string.zero_value))
+        editTextUnitsPurchased.setText(getString(R.string.zero_value))
+        editTextItemPrice.setText(getString(R.string.zero_value))
+    }
+
     private fun checkIfAllDataIsEntered(): Boolean {
         if (TextUtils.isEmpty(editTextItemName.text.toString()) || TextUtils.isEmpty(editTextWeight.text.toString()) ||
-            TextUtils.isEmpty(editTextItemsPurchased.text.toString()) || TextUtils.isEmpty(editTextItemPrice.text.toString())) {
+            TextUtils.isEmpty(editTextUnitsPurchased.text.toString()) || TextUtils.isEmpty(editTextItemPrice.text.toString())) {
             return false
         }
         return true
     }
 
-    private fun manageDropDownMenus() {
+    private fun handleDropDownMenus() {
         val metalDropdownList = resources.getStringArray(R.array.metal_items)
         val weightDropdownList = resources.getStringArray(R.array.weight_items)
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
@@ -162,7 +187,7 @@ class AddNewItemFragment : Fragment() {
 
         editTextItemName = view.findViewById(R.id.edit_text_item_name)
         editTextWeight = view.findViewById(R.id.edit_text_weight)
-        editTextItemsPurchased = view.findViewById(R.id.edit_text_items_purchased)
+        editTextUnitsPurchased = view.findViewById(R.id.edit_text_units_purchased)
         editTextItemPrice = view.findViewById(R.id.edit_text_item_price)
 
         menuCurrency = view.findViewById(R.id.menu_currency)

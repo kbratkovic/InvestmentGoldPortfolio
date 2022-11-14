@@ -9,6 +9,13 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/add_new_item"
+        android:icon="@drawable/ic_add_24"
+        android:title="@string/title_add"
+        android:contentDescription="@string/description_add_new_item"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/prices"
         android:icon="@drawable/ic_money_24"
         android:title="@string/title_prices"

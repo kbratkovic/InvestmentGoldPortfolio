@@ -2,7 +2,6 @@ package com.kbratkovic.investmentgoldportfolio.ui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -12,9 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
 import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
@@ -33,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
 
     private lateinit var toolbar: Toolbar
-    private lateinit var fab: FloatingActionButton
+//    private lateinit var fab: FloatingActionButton
     private var materialSwitch: MaterialSwitch? = null
 
     private val portfolioFragment = PortfolioFragment()
@@ -57,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         drawerNavigationToggle()
         drawerNavigationItemSelectedListener()
         bottomNavigationItemSelectedListener()
-        manageAddNewItemFab()
-        manageDarkModeSwitch()
+//        manageAddNewItemFab()
+        handleDarkModeSwitch()
 
 
 
@@ -93,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
-        fab = findViewById(R.id.fab)
+//        fab = findViewById(R.id.fab)
 
         val menuItem = navigationView.menu.findItem(R.id.switch_theme)
         materialSwitch = menuItem.actionView?.findViewById(R.id.switch_dark_theme)
@@ -150,23 +147,34 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
 
                 R.id.portfolio -> {
+                    bottomNavigation.menu.findItem(R.id.portfolio).isChecked = true
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, portfolioFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    fab.visibility = View.VISIBLE
                     setToolbarTitle(portfolioFragment)
                     true
                 }
 
+                R.id.add_new_item -> {
+                    bottomNavigation.menu.findItem(R.id.add_new_item).isChecked = true
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fragmentContainer, addNewItemFragment)
+                        addToBackStack(null)
+                        commit()
+                    }
+                    setToolbarTitle(addNewItemFragment)
+                    true
+                }
+
                 R.id.prices -> {
+                    bottomNavigation.menu.findItem(R.id.prices).isChecked = true
                     supportFragmentManager.beginTransaction().apply {
                         replace(R.id.fragmentContainer, apiPricesFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    fab.visibility = View.VISIBLE
                     setToolbarTitle(apiPricesFragment)
                     true
                 }
@@ -176,19 +184,20 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun manageAddNewItemFab() {
-        fab.setOnClickListener {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragmentContainer, addNewItemFragment)
-                addToBackStack(null)
-                commit()
-            }
-            setToolbarTitle(addNewItemFragment)
-        }
-    }
+//    private fun manageAddNewItemFab() {
+//        fab.setOnClickListener {
+//            uncheckAllBottomNavItems()
+//            supportFragmentManager.beginTransaction().apply {
+//                replace(R.id.fragmentContainer, addNewItemFragment)
+//                addToBackStack(null)
+//                commit()
+//            }
+//            setToolbarTitle(addNewItemFragment)
+//        }
+//    }
 
 
-    private fun manageDarkModeSwitch() {
+    private fun handleDarkModeSwitch() {
         materialSwitch?.setOnCheckedChangeListener{ _, b ->
             if (b) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -213,6 +222,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun closeDrawerLayout() {
         drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+
+    private fun uncheckAllBottomNavItems() {
+        bottomNavigation.menu.setGroupCheckable(0, false, true)
     }
 
 }
