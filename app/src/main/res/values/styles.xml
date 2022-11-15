@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="portfolio_text_holder">
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="portfolio_value_holder">
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>
