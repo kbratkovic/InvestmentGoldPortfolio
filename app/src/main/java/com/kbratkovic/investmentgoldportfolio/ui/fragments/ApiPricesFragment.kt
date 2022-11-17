@@ -10,13 +10,15 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.DIVIDE_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import timber.log.Timber
 import java.text.DateFormat
@@ -30,14 +32,16 @@ class ApiPricesFragment : Fragment() {
     private lateinit var textViewMetalHighPrice: TextView
     private lateinit var textViewMetalCurrentPrice: TextView
     private lateinit var textViewMetalLowPrice: TextView
-    private lateinit var dropdownMenuMetal: TextInputLayout
-    private lateinit var dropdownMenuCurrency: TextInputLayout
-    private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
+
+//    private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
+    private lateinit var autoCompleteTextViewWeight : AutoCompleteTextView
     private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
+
     private lateinit var linearProgressIndicator: LinearProgressIndicator
     private lateinit var pricesContainer: ConstraintLayout
 
     private lateinit var selectedMetal: String
+    private lateinit var selectedWeight: String
     private lateinit var selectedCurrency: String
 
     private val mMainViewModel: MainViewModel by activityViewModels()
@@ -73,12 +77,23 @@ class ApiPricesFragment : Fragment() {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { goldPriceResponse ->
-                        showPrices()
+                        showPricesContainer()
                         textViewTimeAndDate.text =
                             getString(R.string.time_and_date, formatDateAndTime(goldPriceResponse))
+
                         when (goldPriceResponse.currency) {
-                            CURRENCY_USD_CODE -> displayPricesInUSD(goldPriceResponse)
-                            CURRENCY_EUR_CODE -> displayPricesInEUR(goldPriceResponse)
+                            CURRENCY_USD_CODE -> {
+                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                    displayPricesInUSDAndTroyOunce(goldPriceResponse)
+                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                    displayPricesInUSDAndGrams(goldPriceResponse)
+                            }
+                            CURRENCY_EUR_CODE -> {
+                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                    displayPricesInEURAndTroyOunce(goldPriceResponse)
+                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                    displayPricesInEURAndGrams(goldPriceResponse)
+                            }
                         }
                     }
                 }
@@ -101,18 +116,18 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun initializeLayoutViews(view: View) {
+        linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
         textViewTimeAndDate = view.findViewById(R.id.time_and_date)
-//        textViewMetal = view.findViewById(R.id.metal)
-//        textViewCurrency = view.findViewById(R.id.currency)
-        dropdownMenuMetal = view.findViewById(R.id.menu_metal)
-        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
+
+//        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
+        autoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
         autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
-        dropdownMenuCurrency = view.findViewById(R.id.menu_currency)
+
+        pricesContainer = view.findViewById(R.id.prices_container)
         textViewMetalHighPrice = view.findViewById(R.id.metal_high_price)
         textViewMetalCurrentPrice = view.findViewById(R.id.metal_current_price)
         textViewMetalLowPrice = view.findViewById(R.id.metal_low_price)
-        linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
-        pricesContainer = view.findViewById(R.id.prices_container)
+
     }
 
 
@@ -141,17 +156,34 @@ class ApiPricesFragment : Fragment() {
     private fun handleDropDownMenus() {
         val metalDropdownList = resources.getStringArray(R.array.metal_items)
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
+        val weightDropdownList = resources.getStringArray(R.array.weight_items)
 
-        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalDropdownList)
-        autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
+//        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalDropdownList)
+//        autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
+
+        val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
+        autoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
 
         val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
         autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
+//        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
+//            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+//                if (p2 >= 0) {
+//                    selectedMetal = p0?.getItemAtPosition(p2) as String
+//                }
+//            }
+//        }
+
+        autoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
-                    selectedMetal = p0?.getItemAtPosition(p2) as String
+                    selectedWeight = p0?.getItemAtPosition(p2) as String
+
+                    when (selectedWeight) {
+                        WEIGHT_GRAM_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+                        WEIGHT_TROY_OUNCE_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+                    }
                 }
             }
         }
@@ -162,8 +194,8 @@ class ApiPricesFragment : Fragment() {
                     selectedCurrency = p0?.getItemAtPosition(p2) as String
 
                     when (selectedCurrency) {
-                        CURRENCY_EUR_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_EUR_CODE)
-                        CURRENCY_USD_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
+                        CURRENCY_EUR_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+                        CURRENCY_USD_CODE -> mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
                     }
                 }
             }
@@ -171,7 +203,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInUSD(goldPriceResponse: GoldPriceResponse) {
+    private fun displayPricesInUSDAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
         val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
         textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price)
         textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price)
@@ -179,11 +211,27 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInEUR(goldPriceResponse: GoldPriceResponse) {
-        val localeGermany = NumberFormat.getCurrencyInstance(Locale.GERMANY)
-        textViewMetalHighPrice.text = localeGermany.format(goldPriceResponse.high_price)
-        textViewMetalCurrentPrice.text = localeGermany.format(goldPriceResponse.price)
-        textViewMetalLowPrice.text = localeGermany.format(goldPriceResponse.low_price)
+    private fun displayPricesInUSDAndGrams(goldPriceResponse: GoldPriceResponse) {
+        val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
+        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price / DIVIDE_TROY_OUNCE_CODE)
+        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price / DIVIDE_TROY_OUNCE_CODE)
+        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price / DIVIDE_TROY_OUNCE_CODE)
+    }
+
+
+    private fun displayPricesInEURAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
+        val localeUS = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price)
+        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price)
+        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price)
+    }
+
+
+    private fun displayPricesInEURAndGrams(goldPriceResponse: GoldPriceResponse) {
+        val localeUS = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price / DIVIDE_TROY_OUNCE_CODE)
+        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price / DIVIDE_TROY_OUNCE_CODE)
+        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price / DIVIDE_TROY_OUNCE_CODE)
     }
 
 
@@ -197,27 +245,31 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun hidePrices() {
+    private fun hidePricesContainer() {
         pricesContainer.visibility = View.INVISIBLE
     }
 
 
-    private fun showPrices() {
+    private fun showPricesContainer() {
         pricesContainer.visibility = View.VISIBLE
     }
 
 
-    private fun setDefaultValueInDropDownMenuCurrency() {
+    private fun setDefaultValueInDropDownMenu() {
+        selectedMetal = GOLD_CODE
+        selectedWeight = WEIGHT_TROY_OUNCE_CODE
+        selectedCurrency = CURRENCY_USD_CODE
         autoCompleteTextViewCurrency.setText(CURRENCY_USD_CODE, false)
+        autoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
     }
 
 
     override fun onResume() {
         super.onResume()
-        hidePrices()
+        hidePricesContainer()
         handleDropDownMenus()
-        setDefaultValueInDropDownMenuCurrency()
-        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, CURRENCY_USD_CODE)
+        setDefaultValueInDropDownMenu()
+        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
     }
 
 }

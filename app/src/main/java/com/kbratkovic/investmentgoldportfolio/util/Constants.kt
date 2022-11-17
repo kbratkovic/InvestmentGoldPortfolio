@@ -9,5 +9,9 @@ class Constants {
         const val GOLD_CODE = "XAU"
         const val CURRENCY_USD_CODE = "USD"
         const val CURRENCY_EUR_CODE = "EUR"
+        const val WEIGHT_GRAM_CODE = "gram"
+        const val WEIGHT_TROY_OUNCE_CODE = "troy ounce"
+
+        const val DIVIDE_TROY_OUNCE_CODE = 31.1035
     }
 }

@@ -11,7 +11,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_add_new_item">Add New Item</string>
-    <string name="menu_api_prices">Gold Prices</string>
+    <string name="menu_api_prices">Market Gold Price</string>
     <string name="add_new_nugget_to_portfolio">Add new nugget to portfolio</string>
     <string name="title_portfolio">Portfolio</string>
     <string name="title_add">Add</string>
