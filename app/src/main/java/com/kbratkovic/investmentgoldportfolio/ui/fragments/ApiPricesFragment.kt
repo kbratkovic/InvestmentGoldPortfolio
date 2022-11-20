@@ -16,7 +16,7 @@ import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.DIVIDE_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Resource
@@ -204,34 +204,34 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun displayPricesInUSDAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
-        val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
-        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price)
-        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price)
-        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price)
+        val locale = NumberFormat.getCurrencyInstance(Locale.US)
+        textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price)
+        textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price)
+        textViewMetalLowPrice.text = locale.format(goldPriceResponse.low_price)
     }
 
 
     private fun displayPricesInUSDAndGrams(goldPriceResponse: GoldPriceResponse) {
-        val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
-        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price / DIVIDE_TROY_OUNCE_CODE)
-        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price / DIVIDE_TROY_OUNCE_CODE)
-        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price / DIVIDE_TROY_OUNCE_CODE)
+        val locale = NumberFormat.getCurrencyInstance(Locale.US)
+        textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price / CONVERT_TROY_OUNCE_CODE)
+        textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price / CONVERT_TROY_OUNCE_CODE)
+        textViewMetalLowPrice.text = locale.format(goldPriceResponse.low_price / CONVERT_TROY_OUNCE_CODE)
     }
 
 
     private fun displayPricesInEURAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
-        val localeUS = NumberFormat.getCurrencyInstance(Locale.GERMANY)
-        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price)
-        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price)
-        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price)
+        val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+        textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price)
+        textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price)
+        textViewMetalLowPrice.text = locale.format(goldPriceResponse.low_price)
     }
 
 
     private fun displayPricesInEURAndGrams(goldPriceResponse: GoldPriceResponse) {
-        val localeUS = NumberFormat.getCurrencyInstance(Locale.GERMANY)
-        textViewMetalHighPrice.text = localeUS.format(goldPriceResponse.high_price / DIVIDE_TROY_OUNCE_CODE)
-        textViewMetalCurrentPrice.text = localeUS.format(goldPriceResponse.price / DIVIDE_TROY_OUNCE_CODE)
-        textViewMetalLowPrice.text = localeUS.format(goldPriceResponse.low_price / DIVIDE_TROY_OUNCE_CODE)
+        val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+        textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price / CONVERT_TROY_OUNCE_CODE)
+        textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price / CONVERT_TROY_OUNCE_CODE)
+        textViewMetalLowPrice.text = locale.format(goldPriceResponse.low_price / CONVERT_TROY_OUNCE_CODE)
     }
 
 

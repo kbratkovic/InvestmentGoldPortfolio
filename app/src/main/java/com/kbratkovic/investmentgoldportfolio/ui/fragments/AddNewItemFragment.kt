@@ -13,7 +13,15 @@ import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Resource
 import com.kbratkovic.investmentgoldportfolio.util.Utils
+import timber.log.Timber
+import java.util.*
 
 
 class AddNewItemFragment : Fragment() {
@@ -42,7 +50,10 @@ class AddNewItemFragment : Fragment() {
 
     private var selectedMetal = "Gold"
     private var selectedWeight = "gram"
-    private var selectedCurrency = "USD"
+    private var selectedCurrency = "EUR"
+
+    private var usdExchangeRate: Double = 0.0
+    private var eurExchangeRate: Double = 0.0
 
     private var investmentItem = InvestmentItem()
 
@@ -73,10 +84,46 @@ class AddNewItemFragment : Fragment() {
         handleEditTextFocusListeners()
 
 
+        mMainViewModel.currencyRates.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                   response.data?.let {
+                       usdExchangeRate = it.rates.USD
+                       eurExchangeRate = it.rates.EUR
+
+//                       when (selectedCurrency) {
+//                           CURRENCY_USD_CODE -> {
+//                               val usdExchangeRate = it.rates.USD
+//                           }
+//                           CURRENCY_EUR_CODE -> {
+//                               val eurExchangeRate = it.rates.EUR
+//                           }
+//                       }
+                   }
+                }
+                is Resource.Error -> {
+                    response.message?.let { message ->
+                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                        toast.show()
+                        Timber.e(message)
+                    }
+                }
+                is Resource.Loading -> {
+                }
+            }
+        }
 
     } // end onViewCreated
 
 
+//    private fun convertUSDToEUR(usd: Double) : String {
+//
+//    }
+
+    override fun onResume() {
+        super.onResume()
+        mMainViewModel.getCurrencyRates(selectedCurrency)
+    }
 
     private fun handleEditTextFocusListeners() {
         editTextItemName.requestFocus()
@@ -109,9 +156,29 @@ class AddNewItemFragment : Fragment() {
             investmentItem.weightMeasurement = selectedWeight
             investmentItem.currency = selectedCurrency
             investmentItem.name = editTextItemName.text.toString().trim()
-            investmentItem.weight = editTextWeight.text.toString().trim()
             investmentItem.numberOfUnitsPurchased = editTextUnitsPurchased.text.toString().toInt()
-            investmentItem.purchasePricePerUnit = editTextItemPrice.text.toString().toDouble()
+            investmentItem.purchasePricePerUnit = editTextItemPrice.text.toString().toBigDecimal()
+
+            if (selectedWeight == WEIGHT_GRAM_CODE) {
+                investmentItem.weightInGrams = editTextWeight.text.toString().toDouble()
+                investmentItem.weightInTroyOunce = convertGramsToTroyOunce(investmentItem.weightInGrams)
+            }
+
+            if (selectedWeight == WEIGHT_TROY_OUNCE_CODE) {
+                investmentItem.weightInTroyOunce = editTextWeight.text.toString().toDouble()
+                investmentItem.weightInGrams = convertTroyOunceToGrams(investmentItem.weightInTroyOunce)
+            }
+
+            when (selectedCurrency) {
+                CURRENCY_USD_CODE -> {
+//                    val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+                    investmentItem.purchasePriceInUSD = editTextItemPrice.text.toString().toBigDecimal()
+//                    investmentItem.purchasePriceInEUR = locale.format(investmentItem.purchasePriceInUSD).toString().toBigDecimal()
+                }
+                CURRENCY_EUR_CODE -> {
+                    investmentItem.purchasePriceInEUR = editTextItemPrice.text.toString().toBigDecimal()
+                }
+            }
 
             saveInvestmentItem(investmentItem)
         }
@@ -121,6 +188,15 @@ class AddNewItemFragment : Fragment() {
     private fun saveInvestmentItem(item: InvestmentItem) {
         mMainViewModel.addInvestmentItem(item)
         clearInputFields()
+    }
+
+
+    private fun convertGramsToTroyOunce(weightInGrams: Double) : Double {
+        return weightInGrams / CONVERT_TROY_OUNCE_CODE
+    }
+
+    private fun convertTroyOunceToGrams(weightInTroyOunce: Double) : Double {
+        return weightInTroyOunce * CONVERT_TROY_OUNCE_CODE
     }
 
 
