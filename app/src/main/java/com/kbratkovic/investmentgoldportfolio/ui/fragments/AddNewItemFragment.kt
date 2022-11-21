@@ -21,7 +21,8 @@ import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TR
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
-import java.util.*
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class AddNewItemFragment : Fragment() {
@@ -48,9 +49,9 @@ class AddNewItemFragment : Fragment() {
 
     private lateinit var buttonSave: MaterialButton
 
-    private var selectedMetal = "Gold"
-    private var selectedWeight = "gram"
-    private var selectedCurrency = "EUR"
+    private var selectedMetal = ""
+    private var selectedWeight = ""
+    private var selectedCurrency = ""
 
     private var usdExchangeRate: Double = 0.0
     private var eurExchangeRate: Double = 0.0
@@ -62,7 +63,6 @@ class AddNewItemFragment : Fragment() {
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
-//
 //    } // end onCreate
 
     override fun onCreateView(
@@ -90,15 +90,6 @@ class AddNewItemFragment : Fragment() {
                    response.data?.let {
                        usdExchangeRate = it.rates.USD
                        eurExchangeRate = it.rates.EUR
-
-//                       when (selectedCurrency) {
-//                           CURRENCY_USD_CODE -> {
-//                               val usdExchangeRate = it.rates.USD
-//                           }
-//                           CURRENCY_EUR_CODE -> {
-//                               val eurExchangeRate = it.rates.EUR
-//                           }
-//                       }
                    }
                 }
                 is Resource.Error -> {
@@ -116,14 +107,25 @@ class AddNewItemFragment : Fragment() {
     } // end onViewCreated
 
 
-//    private fun convertUSDToEUR(usd: Double) : String {
-//
-//    }
 
     override fun onResume() {
         super.onResume()
         mMainViewModel.getCurrencyRates(selectedCurrency)
     }
+
+
+    override fun onPause() {
+        super.onPause()
+        getValuesFromDropdownMenus()
+    }
+
+
+    private fun getValuesFromDropdownMenus() {
+        selectedMetal = autoCompleteTextViewMetal.text.toString()
+        selectedWeight = autoCompleteTextViewWeight.text.toString()
+        selectedCurrency = autoCompleteTextViewCurrency.text.toString()
+    }
+
 
     private fun handleEditTextFocusListeners() {
         editTextItemName.requestFocus()
@@ -171,12 +173,14 @@ class AddNewItemFragment : Fragment() {
 
             when (selectedCurrency) {
                 CURRENCY_USD_CODE -> {
-//                    val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
-                    investmentItem.purchasePriceInUSD = editTextItemPrice.text.toString().toBigDecimal()
-//                    investmentItem.purchasePriceInEUR = locale.format(investmentItem.purchasePriceInUSD).toString().toBigDecimal()
+                    val priceInUSD = editTextItemPrice.text.toString().toBigDecimal()
+                    investmentItem.purchasePriceInUSD = priceInUSD
+                    investmentItem.purchasePriceInEUR = convertUSDToEUR(priceInUSD)
                 }
                 CURRENCY_EUR_CODE -> {
-                    investmentItem.purchasePriceInEUR = editTextItemPrice.text.toString().toBigDecimal()
+                    val priceInEUR = editTextItemPrice.text.toString().toBigDecimal()
+                    investmentItem.purchasePriceInEUR = priceInEUR
+                    investmentItem.purchasePriceInUSD = convertEURToUSD(priceInEUR)
                 }
             }
 
@@ -191,9 +195,32 @@ class AddNewItemFragment : Fragment() {
     }
 
 
+    private fun convertUSDToEUR(priceInUSD: BigDecimal) : BigDecimal {
+        try {
+            return priceInUSD.multiply(eurExchangeRate.toBigDecimal())
+        }
+        catch (e: Exception) {
+            Timber.e(e.localizedMessage)
+        }
+        return BigDecimal.valueOf(0.0)
+    }
+
+
+    private fun convertEURToUSD(priceInEUR: BigDecimal) : BigDecimal {
+        try {
+            return priceInEUR.divide(eurExchangeRate.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
+        }
+        catch (e: Exception) {
+            Timber.e(e.localizedMessage)
+        }
+        return BigDecimal.valueOf(0.0)
+    }
+
+
     private fun convertGramsToTroyOunce(weightInGrams: Double) : Double {
         return weightInGrams / CONVERT_TROY_OUNCE_CODE
     }
+
 
     private fun convertTroyOunceToGrams(weightInTroyOunce: Double) : Double {
         return weightInTroyOunce * CONVERT_TROY_OUNCE_CODE
@@ -208,6 +235,7 @@ class AddNewItemFragment : Fragment() {
         editTextItemPrice.setText(getString(R.string.zero_value))
     }
 
+
     private fun checkIfAllDataIsEntered(): Boolean {
         if (TextUtils.isEmpty(editTextItemName.text.toString()) || TextUtils.isEmpty(editTextWeight.text.toString()) ||
             TextUtils.isEmpty(editTextUnitsPurchased.text.toString()) || TextUtils.isEmpty(editTextItemPrice.text.toString())) {
@@ -215,6 +243,7 @@ class AddNewItemFragment : Fragment() {
         }
         return true
     }
+
 
     private fun handleDropDownMenus() {
         val metalDropdownList = resources.getStringArray(R.array.metal_items)
