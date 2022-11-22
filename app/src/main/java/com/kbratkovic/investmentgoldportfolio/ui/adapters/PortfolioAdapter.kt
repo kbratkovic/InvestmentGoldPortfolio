@@ -33,7 +33,7 @@ class PortfolioAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemName.text = dataSet[position].name
-        holder.itemPrice.text = dataSet[position].purchasePricePerUnit.toString()
+//        holder.itemPrice.text = dataSet[position].purchasePricePerUnit.toString()
     }
 
 

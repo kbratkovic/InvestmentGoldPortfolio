@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE

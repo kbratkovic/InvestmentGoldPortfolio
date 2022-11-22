@@ -1,4 +1,4 @@
-package com.kbratkovic.investmentgoldportfolio.models
+package com.kbratkovic.investmentgoldportfolio.network.response
 
 data class GoldPriceResponse(
     val ask: Double,

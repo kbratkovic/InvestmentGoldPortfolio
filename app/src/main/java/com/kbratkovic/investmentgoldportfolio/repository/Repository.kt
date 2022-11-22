@@ -1,11 +1,10 @@
 package com.kbratkovic.investmentgoldportfolio.repository
 
 import androidx.lifecycle.LiveData
-import com.kbratkovic.investmentgoldportfolio.api.RetrofitInstance
+import com.kbratkovic.investmentgoldportfolio.network.RetrofitInstance
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.RATES_API_KEY
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.RATES_BASE_URL
 
 class Repository(
     private val db: AppDatabase
@@ -22,7 +21,11 @@ class Repository(
         RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
 
 
-    suspend fun getCurrencyRates(baseCurrency: String) =
-        RetrofitInstance.api.getCurrencyRates(baseCurrency, RATES_API_KEY)
+    suspend fun getCurrencyRatesBaseEUR() =
+        RetrofitInstance.api.getCurrencyRatesBaseEUR("EUR", RATES_API_KEY)
+
+
+    suspend fun getCurrencyRatesBaseUSD() =
+        RetrofitInstance.api.getCurrencyRatesBaseUSD("USD", RATES_API_KEY)
 
 }

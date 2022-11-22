@@ -1,5 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
+import android.app.Activity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -22,7 +23,6 @@ import com.kbratkovic.investmentgoldportfolio.util.Resource
 import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 
 class AddNewItemFragment : Fragment() {
@@ -61,9 +61,14 @@ class AddNewItemFragment : Fragment() {
     private val mMainViewModel: MainViewModel by activityViewModels()
 
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//    } // end onCreate
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+//        if (savedInstanceState != null) {
+//            selectedMetal = savedInstanceState.getString("selectedMetal").toString()
+//            selectedWeight = savedInstanceState.getString("selectedWeight").toString()
+//            selectedCurrency = savedInstanceState.getString("selectedCurrency").toString()
+//        }
+    } // end onCreate
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,13 +89,32 @@ class AddNewItemFragment : Fragment() {
         handleEditTextFocusListeners()
 
 
-        mMainViewModel.currencyRates.observe(viewLifecycleOwner) { response ->
+        mMainViewModel.currencyRatesBaseEUR.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                    response.data?.let {
                        usdExchangeRate = it.rates.USD
-                       eurExchangeRate = it.rates.EUR
+                       mMainViewModel.getCurrencyRatesBaseUSD()
                    }
+                }
+                is Resource.Error -> {
+                    response.message?.let { message ->
+                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                        toast.show()
+                        Timber.e(message)
+                    }
+                }
+                is Resource.Loading -> {
+                }
+            }
+        }
+
+        mMainViewModel.currencyRatesBaseUSD.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    response.data?.let {
+                        eurExchangeRate = it.rates.EUR
+                    }
                 }
                 is Resource.Error -> {
                     response.message?.let { message ->
@@ -110,15 +134,25 @@ class AddNewItemFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        mMainViewModel.getCurrencyRates(selectedCurrency)
+        handleDropDownMenus()
+        handleEditTextFocusListeners()
+        getValuesFromDropdownMenus()
+        mMainViewModel.getCurrencyRatesBaseEUR()
     }
 
 
     override fun onPause() {
         super.onPause()
-        getValuesFromDropdownMenus()
+//        getValuesFromDropdownMenus()
     }
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("selectedMetal", selectedMetal)
+        outState.putString("selectedWeight", selectedWeight)
+        outState.putString("selectedCurrency", selectedCurrency)
+    }
 
     private fun getValuesFromDropdownMenus() {
         selectedMetal = autoCompleteTextViewMetal.text.toString()
@@ -154,12 +188,13 @@ class AddNewItemFragment : Fragment() {
                 Toast.makeText(requireContext(), "Not all data is entered!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
             investmentItem.metal = selectedMetal
             investmentItem.weightMeasurement = selectedWeight
-            investmentItem.currency = selectedCurrency
+//            investmentItem.currency = selectedCurrency
             investmentItem.name = editTextItemName.text.toString().trim()
             investmentItem.numberOfUnitsPurchased = editTextUnitsPurchased.text.toString().toInt()
-            investmentItem.purchasePricePerUnit = editTextItemPrice.text.toString().toBigDecimal()
+//            investmentItem.purchasePricePerUnit = editTextItemPrice.text.toString().toBigDecimal()
 
             if (selectedWeight == WEIGHT_GRAM_CODE) {
                 investmentItem.weightInGrams = editTextWeight.text.toString().toDouble()
@@ -208,7 +243,7 @@ class AddNewItemFragment : Fragment() {
 
     private fun convertEURToUSD(priceInEUR: BigDecimal) : BigDecimal {
         try {
-            return priceInEUR.divide(eurExchangeRate.toBigDecimal(), 2, RoundingMode.HALF_EVEN)
+            return priceInEUR.multiply(usdExchangeRate.toBigDecimal())
         }
         catch (e: Exception) {
             Timber.e(e.localizedMessage)
@@ -279,7 +314,7 @@ class AddNewItemFragment : Fragment() {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
                     selectedCurrency = p0?.getItemAtPosition(p2) as String
-                    investmentItem.currency = selectedCurrency
+//                    investmentItem.currency = selectedCurrency
                 }
             }
         }

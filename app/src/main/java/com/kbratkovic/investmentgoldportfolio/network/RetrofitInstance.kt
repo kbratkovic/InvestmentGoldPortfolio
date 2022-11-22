@@ -1,7 +1,6 @@
-package com.kbratkovic.investmentgoldportfolio.api
+package com.kbratkovic.investmentgoldportfolio.network
 
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_PRICE_BASE_URL
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.RATES_BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

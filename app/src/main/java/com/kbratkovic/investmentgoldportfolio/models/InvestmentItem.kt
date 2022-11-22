@@ -7,18 +7,14 @@ import java.math.BigDecimal
 @Entity(tableName = "investment_item")
 data class InvestmentItem(
     @PrimaryKey(autoGenerate = true)
-    var id: Int,
-    var name: String,
-    var metal: String,
-    var weightMeasurement: String,
-    var weightInGrams: Double,
-    var weightInTroyOunce: Double,
-    var numberOfUnitsPurchased: Int,
-    var purchasePricePerUnit: BigDecimal?,
-    var purchasePriceInUSD: BigDecimal?,
-    var purchasePriceInEUR: BigDecimal?,
-    var currency: String
+    var id: Int = 0,
+    var name: String = "",
+    var metal: String = "",
+    var weightMeasurement: String = "",
+    var weightInGrams: Double = 0.0,
+    var weightInTroyOunce: Double = 0.0,
+    var numberOfUnitsPurchased: Int = 0,
+    var purchasePriceInUSD: BigDecimal? = null,
+    var purchasePriceInEUR: BigDecimal? = null
 ) {
-    constructor() : this(0, "",  "", "", 0.0, 0.0,0,
-        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,"")
 }

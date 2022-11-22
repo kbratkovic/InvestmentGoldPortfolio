@@ -4,8 +4,8 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.models.CurrencyRatesResponse
-import com.kbratkovic.investmentgoldportfolio.models.GoldPriceResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyRatesResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
 import com.kbratkovic.investmentgoldportfolio.util.Resource
@@ -35,7 +35,9 @@ class MainViewModel(
 
     val currentGoldPrice: MutableLiveData<Resource<GoldPriceResponse>> = MutableLiveData()
 
-    val currencyRates: MutableLiveData<Resource<CurrencyRatesResponse>> = MutableLiveData()
+    val currencyRatesBaseEUR: MutableLiveData<Resource<CurrencyRatesResponse>> = MutableLiveData()
+
+    val currencyRatesBaseUSD: MutableLiveData<Resource<CurrencyRatesResponse>> = MutableLiveData()
 
 
     // Current Gold Price
@@ -62,12 +64,12 @@ class MainViewModel(
     }
 
 
-    // Currency Rates
-    fun getCurrencyRates(baseCurrency: String) = viewModelScope.launch {
+    // Currency Rates base EUR
+    fun getCurrencyRatesBaseEUR() = viewModelScope.launch {
 
         try {
-            val response = repository.getCurrencyRates(baseCurrency)
-            currencyRates.postValue(handleCurrencyRatesResponse(response))
+            val response = repository.getCurrencyRatesBaseEUR()
+            currencyRatesBaseEUR.postValue(handleCurrencyRatesBaseEurResponse(response))
         } catch (e: SocketTimeoutException) {
             Timber.e(e.localizedMessage)
             mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
@@ -75,7 +77,30 @@ class MainViewModel(
 
     }
 
-    private fun handleCurrencyRatesResponse(response: Response<CurrencyRatesResponse>) : Resource<CurrencyRatesResponse> {
+    private fun handleCurrencyRatesBaseEurResponse(response: Response<CurrencyRatesResponse>) : Resource<CurrencyRatesResponse> {
+        if (response.isSuccessful) {
+            response.body()?.let { currencyRatesResponse ->
+                return Resource.Success(currencyRatesResponse)
+            }
+        }
+        return Resource.Error(response.message())
+    }
+
+
+    // Currency Rates base USD
+    fun getCurrencyRatesBaseUSD() = viewModelScope.launch {
+
+        try {
+            val response = repository.getCurrencyRatesBaseUSD()
+            currencyRatesBaseUSD.postValue(handleCurrencyRatesBaseUsdResponse(response))
+        } catch (e: SocketTimeoutException) {
+            Timber.e(e.localizedMessage)
+            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
+        }
+
+    }
+
+    private fun handleCurrencyRatesBaseUsdResponse(response: Response<CurrencyRatesResponse>) : Resource<CurrencyRatesResponse> {
         if (response.isSuccessful) {
             response.body()?.let { currencyRatesResponse ->
                 return Resource.Success(currencyRatesResponse)
