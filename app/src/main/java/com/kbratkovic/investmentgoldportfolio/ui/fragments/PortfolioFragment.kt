@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 
 //import com.kbratkovic.investmentgoldportfolio.databinding.FragmentHomeBinding

@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyRatesResponse
 import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
-import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import kotlinx.coroutines.launch

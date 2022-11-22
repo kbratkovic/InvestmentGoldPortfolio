@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 
 class PortfolioAdapter(
     private var dataSet: List<InvestmentItem>
