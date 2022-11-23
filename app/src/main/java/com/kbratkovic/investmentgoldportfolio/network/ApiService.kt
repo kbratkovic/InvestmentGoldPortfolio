@@ -1,6 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.network
 
-import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyRatesResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyExchangeRatesResponse
 import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_PRICE_API_KEY
 import retrofit2.Response
@@ -24,13 +24,13 @@ interface ApiService {
     suspend fun getCurrencyRatesBaseEUR(
         @Query("base") baseCurrency: String,
         @Query("apiKey") apiKey: String
-    ): Response<CurrencyRatesResponse>
+    ): Response<CurrencyExchangeRatesResponse>
 
 
     @GET("https://anyapi.io/api/v1/exchange/rates/")
     suspend fun getCurrencyRatesBaseUSD(
         @Query("base") baseCurrency: String,
         @Query("apiKey") apiKey: String
-    ): Response<CurrencyRatesResponse>
+    ): Response<CurrencyExchangeRatesResponse>
 
 }

@@ -1,6 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.network.response
 
-data class CurrencyRatesResponse(
+data class CurrencyExchangeRatesResponse(
     val base: String = "",
     val lastUpdate: Int = 0,
     val rates: Rates = Rates()

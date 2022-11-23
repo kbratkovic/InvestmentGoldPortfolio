@@ -4,11 +4,11 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.domain.mappers.CurrencyRatesMapper
+import com.kbratkovic.investmentgoldportfolio.domain.mappers.CurrencyExchangeRatesMapper
 import com.kbratkovic.investmentgoldportfolio.domain.mappers.GoldPriceMapper
 import com.kbratkovic.investmentgoldportfolio.domain.models.CurrencyRates
 import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
-import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyRatesResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyExchangeRatesResponse
 import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
@@ -85,10 +85,10 @@ class MainViewModel(
 
     }
 
-    private fun handleCurrencyRatesBaseEurResponse(response: Response<CurrencyRatesResponse>) : Resource<CurrencyRates> {
+    private fun handleCurrencyRatesBaseEurResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
         if (response.isSuccessful) {
             response.body()?.let { currencyRatesResponse ->
-                return Resource.Success(CurrencyRatesMapper.buildFrom(currencyRatesResponse))
+                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
             }
         }
         return Resource.Error(response.message())
@@ -108,10 +108,10 @@ class MainViewModel(
 
     }
 
-    private fun handleCurrencyRatesBaseUsdResponse(response: Response<CurrencyRatesResponse>) : Resource<CurrencyRates> {
+    private fun handleCurrencyRatesBaseUsdResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
         if (response.isSuccessful) {
             response.body()?.let { currencyRatesResponse ->
-                return Resource.Success(CurrencyRatesMapper.buildFrom(currencyRatesResponse))
+                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
             }
         }
         return Resource.Error(response.message())
