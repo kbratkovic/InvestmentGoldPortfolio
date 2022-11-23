@@ -4,21 +4,46 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
+import com.kbratkovic.investmentgoldportfolio.util.Constants
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.NumberFormat
+import java.util.*
 
-//import com.kbratkovic.investmentgoldportfolio.databinding.FragmentHomeBinding
 
 class PortfolioFragment : Fragment() {
 
+    private var selectedCurrency: String = ""
+    private var selectedWeight: String = ""
     private var dataSet: List<InvestmentItem> = listOf()
+
+    lateinit var recyclerView: RecyclerView
+    lateinit var adapter: PortfolioAdapter
+
+    private lateinit var autoCompleteTextViewWeight: AutoCompleteTextView
+    private lateinit var autoCompleteTextViewCurrency: AutoCompleteTextView
+
+    private lateinit var totalPurchasePriceValue: TextView
+    private lateinit var totalWeightValue: TextView
+
+    private var sumInEUR = BigDecimal.ZERO
+    private var sumInUSD = BigDecimal.ZERO
+
+    private var sumInGrams = 0.0
+    private var sumInTroyOunce = 0.0
+
     private val mMainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -28,19 +53,123 @@ class PortfolioFragment : Fragment() {
     ): View {
 
         return inflater.inflate(R.layout.fragment_portfolio, container, false)
-    }
+    } // end onCreateView
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initializeLayoutViews(view)
+        handleRecyclerView()
+        observeInvestmentItemsChange()
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val adapter = PortfolioAdapter(dataSet)
-        recyclerView.adapter = adapter
+    } // end onViewCreated
 
-        mMainViewModel.allInvestmentItems.observe(viewLifecycleOwner) {
-            adapter.sendDataToAdapter(it)
+
+    override fun onResume() {
+        super.onResume()
+        handleDropDownMenus()
+        getValuesFromDropdownMenus()
+    }
+
+
+    private fun handleDropDownMenus() {
+        val currencyDropdownList = resources.getStringArray(R.array.currency_items)
+        val weightDropdownList = resources.getStringArray(R.array.weight_items)
+
+        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
+        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
+
+        val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
+        autoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
+
+        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 >= 0) {
+                    selectedCurrency = p0?.getItemAtPosition(p2) as String
+
+                    setTotalPurchasePrice()
+                }
+            }
+        }
+
+        autoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                selectedWeight = p0?.getItemAtPosition(p2) as String
+
+                setTotalWeight()
+            }
+        }
+    } // end handleDropDownMenus
+
+
+    private fun setTotalPurchasePrice() {
+        when (selectedCurrency) {
+            Constants.CURRENCY_USD_CODE -> {
+                val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
+                totalPurchasePriceValue.text = localeUS.format(sumInUSD)
+            }
+            Constants.CURRENCY_EUR_CODE -> {
+                val localeEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+                totalPurchasePriceValue.text = localeEUR.format(sumInEUR)
+            }
         }
     }
+
+
+    private fun setTotalWeight() {
+        when (selectedWeight) {
+            Constants.WEIGHT_GRAM_CODE -> {
+                totalWeightValue.text =
+                    getString(R.string.total_weight_value, BigDecimal(sumInGrams).setScale(2, RoundingMode.HALF_EVEN).toString(), Constants.WEIGHT_GRAM_SHORT_CODE)
+
+            }
+            Constants.WEIGHT_TROY_OUNCE_CODE -> {
+                totalWeightValue.text =
+                    getString(R.string.total_weight_value, BigDecimal(sumInTroyOunce).setScale(2, RoundingMode.HALF_EVEN).toString(), Constants.WEIGHT_TROY_OUNCE_SHORT_CODE)
+            }
+        }
+    }
+
+
+    private fun observeInvestmentItemsChange() {
+        mMainViewModel.allInvestmentItems.observe(viewLifecycleOwner) { listOfInvestmentItems ->
+            adapter.sendDataToAdapter(listOfInvestmentItems)
+
+            for (item in listOfInvestmentItems) {
+                sumInEUR = sumInEUR.add(item.purchasePriceInEUR)
+                sumInUSD = sumInUSD.add(item.purchasePriceInUSD)
+                sumInGrams = sumInGrams.plus(item.weightInGrams)
+                sumInTroyOunce = sumInTroyOunce.plus(item.weightInTroyOunce)
+            }
+
+            setTotalPurchasePrice()
+            setTotalWeight()
+        }
+    } // end observeInvestmentItemsChange
+
+
+    private fun getValuesFromDropdownMenus() {
+        selectedWeight = autoCompleteTextViewWeight.text.toString()
+        selectedCurrency = autoCompleteTextViewCurrency.text.toString()
+    }
+
+
+    private fun initializeLayoutViews(view: View) {
+        recyclerView = view.findViewById(R.id.recyclerView)
+        adapter = PortfolioAdapter(dataSet)
+        autoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
+        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
+        totalPurchasePriceValue = view.findViewById(R.id.total_purchase_price_value)
+        totalWeightValue = view.findViewById(R.id.total_weight_value)
+    }
+
+
+    private fun handleRecyclerView() {
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
+    }
+
+
+
 }

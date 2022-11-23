@@ -14,6 +14,8 @@ class Constants {
         const val CURRENCY_EUR_CODE = "EUR"
         const val WEIGHT_GRAM_CODE = "gram"
         const val WEIGHT_TROY_OUNCE_CODE = "troy ounce"
+        const val WEIGHT_GRAM_SHORT_CODE = "g"
+        const val WEIGHT_TROY_OUNCE_SHORT_CODE = "oz t"
 
         const val CONVERT_TROY_OUNCE_CODE = 31.1035
     }

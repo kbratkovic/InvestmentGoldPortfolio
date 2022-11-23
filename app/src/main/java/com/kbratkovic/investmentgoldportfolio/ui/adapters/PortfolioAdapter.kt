@@ -16,11 +16,21 @@ class PortfolioAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val itemName: TextView
-        val itemPrice: TextView
+        val itemMetal: TextView
+        val itemWeightInGrams: TextView
+        val itemWeightInTroyOunce: TextView
+        val itemUnitsPurchased: TextView
+        val itemPurchasePriceInUSD: TextView
+        val itemPurchasePriceInEUR: TextView
 
         init {
             itemName = view.findViewById(R.id.item_name)
-            itemPrice = view.findViewById(R.id.item_price)
+            itemMetal = view.findViewById(R.id.item_metal)
+            itemWeightInGrams = view.findViewById(R.id.item_weight_in_grams)
+            itemWeightInTroyOunce = view.findViewById(R.id.item_weight_in_troy_ounce)
+            itemUnitsPurchased = view.findViewById(R.id.item_units_purchased)
+            itemPurchasePriceInUSD = view.findViewById(R.id.item_purchase_price_in_usd)
+            itemPurchasePriceInEUR = view.findViewById(R.id.item_purchase_price_in_eur)
         }
     }
 
@@ -33,7 +43,12 @@ class PortfolioAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemName.text = dataSet[position].name
-//        holder.itemPrice.text = dataSet[position].purchasePricePerUnit.toString()
+        holder.itemMetal.text = dataSet[position].metal
+        holder.itemWeightInGrams.text = dataSet[position].weightInGrams.toString()
+        holder.itemWeightInTroyOunce.text = dataSet[position].weightInTroyOunce.toString()
+        holder.itemUnitsPurchased.text = dataSet[position].numberOfUnitsPurchased.toString()
+        holder.itemPurchasePriceInUSD.text = dataSet[position].purchasePriceInUSD.toString()
+        holder.itemPurchasePriceInEUR.text = dataSet[position].purchasePriceInEUR.toString()
     }
 
 

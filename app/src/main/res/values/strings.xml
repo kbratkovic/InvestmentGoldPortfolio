@@ -46,4 +46,7 @@
     <string name="total_current_value">Total Current Value:</string>
     <string name="total_profit">Total Profit:</string>
 
+    <string name="total_weight_value">%1$s %2$s</string>
+
+
 </resources>

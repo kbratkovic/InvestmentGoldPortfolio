@@ -15,6 +15,6 @@ data class InvestmentItem(
     var weightInTroyOunce: Double = 0.0,
     var numberOfUnitsPurchased: Int = 0,
     var purchasePriceInUSD: BigDecimal? = null,
-    var purchasePriceInEUR: BigDecimal? = null
+    var purchasePriceInEUR: BigDecimal = BigDecimal.ZERO
 ) {
 }

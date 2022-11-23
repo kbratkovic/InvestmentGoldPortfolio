@@ -35,6 +35,7 @@ class MainViewModel(
     }
 
 
+//    private val _allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
     private val _currentGoldPrice: MutableLiveData<Resource<GoldPrice>> = MutableLiveData()

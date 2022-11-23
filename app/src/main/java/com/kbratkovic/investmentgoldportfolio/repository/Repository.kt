@@ -12,6 +12,7 @@ class Repository(
     private val db: AppDatabase
 ) {
 
+    // database
     val getAllInvestmentItems: LiveData<List<InvestmentItem>> =
         db.investmentItemDao().getAllInvestmentItems()
 
@@ -19,6 +20,8 @@ class Repository(
         db.investmentItemDao().addInvestmentItem(item)
 
 
+
+    // api
     suspend fun getCurrentGoldPrice(symbol: String, currency: String): Response<GoldPriceResponse> {
         return RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
     }

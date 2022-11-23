@@ -15,4 +15,6 @@ interface InvestmentItemDao {
 
     @Query("SELECT * FROM investment_item ORDER BY id ASC")
     fun getAllInvestmentItems(): LiveData<List<InvestmentItem>>
+
+
 }
