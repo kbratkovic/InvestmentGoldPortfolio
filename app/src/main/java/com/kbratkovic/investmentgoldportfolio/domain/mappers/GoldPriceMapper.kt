@@ -1,5 +1,6 @@
-package com.kbratkovic.investmentgoldportfolio.domain.models
+package com.kbratkovic.investmentgoldportfolio.domain.mappers
 
+import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
 import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 
 object GoldPriceMapper {
