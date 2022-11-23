@@ -3,8 +3,6 @@ package com.kbratkovic.investmentgoldportfolio.repository
 import androidx.lifecycle.LiveData
 import com.kbratkovic.investmentgoldportfolio.network.RetrofitInstance
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
-import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
-import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPriceMapper
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.RATES_API_KEY

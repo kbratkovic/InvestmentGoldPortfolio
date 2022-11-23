@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
+import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
@@ -33,7 +33,6 @@ class ApiPricesFragment : Fragment() {
     private lateinit var textViewMetalCurrentPrice: TextView
     private lateinit var textViewMetalLowPrice: TextView
 
-//    private lateinit var autoCompleteTextViewMetal : AutoCompleteTextView
     private lateinit var autoCompleteTextViewWeight : AutoCompleteTextView
     private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
 
@@ -46,12 +45,6 @@ class ApiPricesFragment : Fragment() {
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    } // end onCreate
 
 
     override fun onCreateView(
@@ -70,56 +63,24 @@ class ApiPricesFragment : Fragment() {
 
         initializeLayoutViews(view)
         startOnDataChangeListener()
-
-
-        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is Resource.Success -> {
-                    hideProgressBar()
-                    response.data?.let { goldPriceResponse ->
-                        showPricesContainer()
-                        textViewTimeAndDate.text =
-                            getString(R.string.time_and_date, formatDateAndTime(goldPriceResponse))
-
-                        when (goldPriceResponse.currency) {
-                            CURRENCY_USD_CODE -> {
-                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                    displayPricesInUSDAndTroyOunce(goldPriceResponse)
-                                if (selectedWeight == WEIGHT_GRAM_CODE)
-                                    displayPricesInUSDAndGrams(goldPriceResponse)
-                            }
-                            CURRENCY_EUR_CODE -> {
-                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                    displayPricesInEURAndTroyOunce(goldPriceResponse)
-                                if (selectedWeight == WEIGHT_GRAM_CODE)
-                                    displayPricesInEURAndGrams(goldPriceResponse)
-                            }
-                        }
-                    }
-                }
-                is Resource.Error -> {
-                    response.message?.let { message ->
-                        textViewTimeAndDate.text = message
-                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-                        toast.show()
-                        Timber.e(message)
-                    }
-                }
-                is Resource.Loading -> {
-                    showProgressBar()
-                }
-            }
-        }
+        observeCurrentGoldPrice()
 
     } // onViewCreated
 
+
+    override fun onResume() {
+        super.onResume()
+        hidePricesContainer()
+        handleDropDownMenus()
+        setDefaultValueInDropDownMenu()
+        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+    }
 
 
     private fun initializeLayoutViews(view: View) {
         linearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
         textViewTimeAndDate = view.findViewById(R.id.time_and_date)
 
-//        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
         autoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
         autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
 
@@ -143,7 +104,49 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun formatDateAndTime(goldPriceResponse: GoldPriceResponse) : String {
+    private fun observeCurrentGoldPrice() {
+        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    hideProgressBar()
+                    response.data?.let { goldPrice ->
+                        showPricesContainer()
+                        textViewTimeAndDate.text =
+                            getString(R.string.time_and_date, formatDateAndTime(goldPrice))
+
+                        when (goldPrice.currency) {
+                            CURRENCY_USD_CODE -> {
+                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                    displayPricesInUSDAndTroyOunce(goldPrice)
+                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                    displayPricesInUSDAndGrams(goldPrice)
+                            }
+                            CURRENCY_EUR_CODE -> {
+                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                    displayPricesInEURAndTroyOunce(goldPrice)
+                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                    displayPricesInEURAndGrams(goldPrice)
+                            }
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    response.message?.let { message ->
+                        textViewTimeAndDate.text = message
+                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                        toast.show()
+                        Timber.e(message)
+                    }
+                }
+                is Resource.Loading -> {
+                    showProgressBar()
+                }
+            }
+        }
+    }
+
+
+    private fun formatDateAndTime(goldPriceResponse: GoldPrice) : String {
         val date = Date(goldPriceResponse.timestamp.toLong() * 1000)
         val dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.US)
@@ -154,26 +157,11 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun handleDropDownMenus() {
-        val metalDropdownList = resources.getStringArray(R.array.metal_items)
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
         val weightDropdownList = resources.getStringArray(R.array.weight_items)
 
-//        val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalDropdownList)
-//        autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
-
         val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
         autoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
-
-        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
-        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
-
-//        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
-//            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-//                if (p2 >= 0) {
-//                    selectedMetal = p0?.getItemAtPosition(p2) as String
-//                }
-//            }
-//        }
 
         autoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -187,6 +175,10 @@ class ApiPricesFragment : Fragment() {
                 }
             }
         }
+
+
+        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
+        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
         autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -203,7 +195,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInUSDAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
+    private fun displayPricesInUSDAndTroyOunce(goldPriceResponse: GoldPrice) {
         val locale = NumberFormat.getCurrencyInstance(Locale.US)
         textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price)
         textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price)
@@ -211,7 +203,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInUSDAndGrams(goldPriceResponse: GoldPriceResponse) {
+    private fun displayPricesInUSDAndGrams(goldPriceResponse: GoldPrice) {
         val locale = NumberFormat.getCurrencyInstance(Locale.US)
         textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price / CONVERT_TROY_OUNCE_CODE)
         textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price / CONVERT_TROY_OUNCE_CODE)
@@ -219,7 +211,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInEURAndTroyOunce(goldPriceResponse: GoldPriceResponse) {
+    private fun displayPricesInEURAndTroyOunce(goldPriceResponse: GoldPrice) {
         val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
         textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price)
         textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price)
@@ -227,7 +219,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun displayPricesInEURAndGrams(goldPriceResponse: GoldPriceResponse) {
+    private fun displayPricesInEURAndGrams(goldPriceResponse: GoldPrice) {
         val locale = NumberFormat.getCurrencyInstance(Locale.GERMANY)
         textViewMetalHighPrice.text = locale.format(goldPriceResponse.high_price / CONVERT_TROY_OUNCE_CODE)
         textViewMetalCurrentPrice.text = locale.format(goldPriceResponse.price / CONVERT_TROY_OUNCE_CODE)
@@ -263,13 +255,5 @@ class ApiPricesFragment : Fragment() {
         autoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
     }
 
-
-    override fun onResume() {
-        super.onResume()
-        hidePricesContainer()
-        handleDropDownMenus()
-        setDefaultValueInDropDownMenu()
-        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
-    }
 
 }
