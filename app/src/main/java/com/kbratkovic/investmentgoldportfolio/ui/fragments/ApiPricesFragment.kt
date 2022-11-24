@@ -63,7 +63,7 @@ class ApiPricesFragment : Fragment() {
 
         initializeLayoutViews(view)
         startOnDataChangeListener()
-        observeCurrentGoldPrice()
+        observeCurrentGoldPriceChange()
 
     } // onViewCreated
 
@@ -104,7 +104,7 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun observeCurrentGoldPrice() {
+    private fun observeCurrentGoldPriceChange() {
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
