@@ -60,14 +60,6 @@ class AddNewItemFragment : Fragment() {
     private val mMainViewModel: MainViewModel by activityViewModels()
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        if (savedInstanceState != null) {
-//            selectedMetal = savedInstanceState.getString("selectedMetal").toString()
-//            selectedWeight = savedInstanceState.getString("selectedWeight").toString()
-//            selectedCurrency = savedInstanceState.getString("selectedCurrency").toString()
-//        }
-    } // end onCreate
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,12 +89,6 @@ class AddNewItemFragment : Fragment() {
         handleEditTextFocusListeners()
         getValuesFromDropdownMenus()
         mMainViewModel.getCurrencyRatesBaseEUR()
-    }
-
-
-    override fun onPause() {
-        super.onPause()
-//        getValuesFromDropdownMenus()
     }
 
 
@@ -189,6 +175,7 @@ class AddNewItemFragment : Fragment() {
                 Toast.makeText(requireContext(), "Not all data is entered!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            val unitsPurchased = editTextUnitsPurchased.text.toString().toBigDecimal()
 
             investmentItem.metal = selectedMetal
             investmentItem.weightMeasurement = selectedWeight
@@ -207,12 +194,12 @@ class AddNewItemFragment : Fragment() {
 
             when (selectedCurrency) {
                 CURRENCY_USD_CODE -> {
-                    val priceInUSD = editTextItemPrice.text.toString().toBigDecimal()
+                    val priceInUSD = editTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
                     investmentItem.purchasePriceInUSD = priceInUSD
                     investmentItem.purchasePriceInEUR = convertUSDToEUR(priceInUSD)
                 }
                 CURRENCY_EUR_CODE -> {
-                    val priceInEUR = editTextItemPrice.text.toString().toBigDecimal()
+                    val priceInEUR = editTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
                     investmentItem.purchasePriceInEUR = priceInEUR
                     investmentItem.purchasePriceInUSD = convertEURToUSD(priceInEUR)
                 }
