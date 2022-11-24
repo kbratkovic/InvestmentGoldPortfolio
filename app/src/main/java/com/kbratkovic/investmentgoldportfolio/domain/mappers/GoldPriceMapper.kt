@@ -12,7 +12,8 @@ object GoldPriceMapper {
             low_price = goldPriceResponse.low_price,
             metal = goldPriceResponse.metal,
             price = goldPriceResponse.price,
-            timestamp = goldPriceResponse.timestamp
+            timestamp = goldPriceResponse.timestamp,
+            price_gram_24k = goldPriceResponse.price_gram_24k
         )
     }
 

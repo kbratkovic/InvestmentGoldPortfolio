@@ -57,7 +57,7 @@ class MainViewModel(
             _currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
         } catch (e: SocketTimeoutException) {
             Timber.e(e.localizedMessage)
-            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
+            mOnDataChangeListener?.onDataChanged(context.getString(R.string.network_error))
         }
 
     }

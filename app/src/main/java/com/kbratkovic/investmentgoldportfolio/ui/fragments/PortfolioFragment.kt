@@ -4,19 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
+import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 import com.kbratkovic.investmentgoldportfolio.util.Constants
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Resource
+import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -37,12 +39,17 @@ class PortfolioFragment : Fragment() {
 
     private lateinit var totalPurchasePriceValue: TextView
     private lateinit var totalWeightValue: TextView
+    private lateinit var totalCurrentValue: TextView
+    private lateinit var totalProfitValue: TextView
 
     private var sumInEUR = BigDecimal.ZERO
     private var sumInUSD = BigDecimal.ZERO
 
     private var sumInGrams = 0.0
     private var sumInTroyOunce = 0.0
+
+    private lateinit var goldPrice: GoldPrice
+
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -61,7 +68,9 @@ class PortfolioFragment : Fragment() {
 
         initializeLayoutViews(view)
         handleRecyclerView()
+        getValuesFromDropdownMenus()
         observeInvestmentItemsChange()
+        observeCurrentGoldPriceChange()
 
     } // end onViewCreated
 
@@ -69,7 +78,9 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-        getValuesFromDropdownMenus()
+//        getValuesFromDropdownMenus()
+        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+
     }
 
 
@@ -137,6 +148,7 @@ class PortfolioFragment : Fragment() {
             adapter.sendDataToAdapter(listOfInvestmentItems)
 
             for (item in listOfInvestmentItems) {
+                clearDisplayedData()
                 sumInEUR = sumInEUR.add(item.purchasePriceInEUR)
                 sumInUSD = sumInUSD.add(item.purchasePriceInUSD)
                 sumInGrams = sumInGrams.plus(item.weightInGrams)
@@ -147,6 +159,54 @@ class PortfolioFragment : Fragment() {
             setTotalWeight()
         }
     } // end observeInvestmentItemsChange
+
+
+    private fun clearDisplayedData() {
+        sumInEUR = BigDecimal.ZERO
+        sumInUSD = BigDecimal.ZERO
+        sumInGrams = 0.0
+        sumInTroyOunce = 0.0
+    }
+
+
+    private fun setTotalCurrentValue(pricePerGram: Double) {
+        when (selectedCurrency) {
+            Constants.CURRENCY_USD_CODE -> {
+                val localeUS = NumberFormat.getCurrencyInstance(Locale.US)
+                val value = sumInUSD.multiply(pricePerGram.toBigDecimal())
+                totalCurrentValue.text = localeUS.format(value)
+            }
+            Constants.CURRENCY_EUR_CODE -> {
+                val localeEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
+                val value = sumInEUR.multiply(pricePerGram.toBigDecimal())
+                totalCurrentValue.text = localeEUR.format(value)
+            }
+        }
+    }
+
+
+    private fun observeCurrentGoldPriceChange() {
+        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    response.data?.let { goldPrice ->
+                        this.goldPrice = goldPrice
+                        setTotalCurrentValue(goldPrice.price_gram_24k)
+//                        totalCurrentValue.text = (goldPrice.price_gram_24k * sum
+                    }
+                }
+                is Resource.Error -> {
+                    response.message?.let { message ->
+                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+                        toast.show()
+                        Timber.e(message)
+                    }
+                }
+                is Resource.Loading -> {
+                }
+            }
+        }
+    } // end observeCurrentGoldPriceChange
 
 
     private fun getValuesFromDropdownMenus() {
@@ -162,6 +222,8 @@ class PortfolioFragment : Fragment() {
         autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
         totalPurchasePriceValue = view.findViewById(R.id.total_purchase_price_value)
         totalWeightValue = view.findViewById(R.id.total_weight_value)
+        totalCurrentValue = view.findViewById(R.id.total_current_value_value)
+        totalProfitValue = view.findViewById(R.id.total_profit_value)
     }
 
 

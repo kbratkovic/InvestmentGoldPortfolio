@@ -2,6 +2,8 @@ package com.kbratkovic.investmentgoldportfolio.ui
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -50,16 +52,25 @@ class MainActivity : AppCompatActivity() {
 
         setDefaultFragment()
         initializeViewModel()
+        startOnDataChangeListener()
         initializeViews()
         drawerNavigationToggle()
         drawerNavigationItemSelectedListener()
         bottomNavigationItemSelectedListener()
-//        manageAddNewItemFab()
         handleDarkModeSwitch()
 
-
-
     } // onCreate End
+
+
+    private fun startOnDataChangeListener() {
+        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
+            override fun onDataChanged(message: String?) {
+                if (message.equals(getString(R.string.network_error))) {
+                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
 
 
     private fun initializeTimberLogging() {
@@ -179,19 +190,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-//    private fun manageAddNewItemFab() {
-//        fab.setOnClickListener {
-//            uncheckAllBottomNavItems()
-//            supportFragmentManager.beginTransaction().apply {
-//                replace(R.id.fragmentContainer, addNewItemFragment)
-//                addToBackStack(null)
-//                commit()
-//            }
-//            setToolbarTitle(addNewItemFragment)
-//        }
-//    }
 
 
     private fun handleDarkModeSwitch() {

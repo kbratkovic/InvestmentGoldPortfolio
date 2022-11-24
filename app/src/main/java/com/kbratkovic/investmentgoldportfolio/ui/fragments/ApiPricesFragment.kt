@@ -63,6 +63,7 @@ class ApiPricesFragment : Fragment() {
 
         initializeLayoutViews(view)
         startOnDataChangeListener()
+        setDefaultValueInDropDownMenu()
         observeCurrentGoldPriceChange()
 
     } // onViewCreated
@@ -70,10 +71,10 @@ class ApiPricesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        hidePricesContainer()
+//        hidePricesContainer()
         handleDropDownMenus()
         setDefaultValueInDropDownMenu()
-        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
+//        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
     }
 
 
@@ -132,7 +133,6 @@ class ApiPricesFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     response.message?.let { message ->
-                        textViewTimeAndDate.text = message
                         val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
                         toast.show()
                         Timber.e(message)
