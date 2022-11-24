@@ -25,6 +25,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginTop="15dp"
+        android:baselineAligned="false"
         app:layout_constraintTop_toBottomOf="@+id/edit_text_item_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -137,7 +138,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/weight"
                 android:inputType="none"
-                android:text="@string/weight_gram" />
+                android:text="@string/weight_troy_ounce" />
 
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
