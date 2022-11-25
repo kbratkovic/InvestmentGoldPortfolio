@@ -1,8 +1,8 @@
 package com.kbratkovic.investmentgoldportfolio.ui
 
+
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +12,8 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
@@ -27,19 +29,18 @@ import timber.log.Timber.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var bottomNavigation: BottomNavigationView
-    private lateinit var navigationView: NavigationView
+    private lateinit var mDrawerLayout: DrawerLayout
+    private lateinit var mBottomNavigation: BottomNavigationView
+    private lateinit var mNavigationView: NavigationView
 
-    private lateinit var toolbar: Toolbar
-//    private lateinit var fab: FloatingActionButton
+    private lateinit var mToolbar: Toolbar
     private var materialSwitch: MaterialSwitch? = null
 
-    private val portfolioFragment = PortfolioFragment()
-    private val settingsFragment = SettingsFragment()
-    private val galleryFragment = GalleryFragment()
-    private val addNewItemFragment = AddNewItemFragment()
-    private val apiPricesFragment = ApiPricesFragment()
+    private val mPortfolioFragment = PortfolioFragment()
+    private val mSettingsFragment = SettingsFragment()
+    private val mGalleryFragment = GalleryFragment()
+    private val mAddNewItemFragment = AddNewItemFragment()
+    private val mApiPricesFragment = ApiPricesFragment()
 
     private lateinit var mMainViewModel: MainViewModel
 
@@ -49,15 +50,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         initializeTimberLogging()
-
-        setDefaultFragment()
         initializeViewModel()
         startOnDataChangeListener()
         initializeViews()
-        drawerNavigationToggle()
+        setDrawerNavigationToggle()
         drawerNavigationItemSelectedListener()
-        bottomNavigationItemSelectedListener()
+//        bottomNavigationItemSelectedListener()
         handleDarkModeSwitch()
+        setBottomNavigation()
 
     } // onCreate End
 
@@ -80,12 +80,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setDefaultFragment() {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragmentContainer, portfolioFragment)
-            addToBackStack(null)
-            commit()
-        }
+    private fun setBottomNavigation() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
+        setupWithNavController(mBottomNavigation, navController)
     }
 
 
@@ -97,41 +95,41 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initializeViews() {
-        toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.navigation_view)
-        bottomNavigation = findViewById(R.id.bottom_navigation)
+        mToolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        mDrawerLayout = findViewById(R.id.drawer_layout)
+        mNavigationView = findViewById(R.id.drawer_navigation_view)
+        mBottomNavigation = findViewById(R.id.bottom_navigation)
 //        fab = findViewById(R.id.fab)
 
-        val menuItem = navigationView.menu.findItem(R.id.switch_theme)
+        val menuItem = mNavigationView.menu.findItem(R.id.switch_theme)
         materialSwitch = menuItem.actionView?.findViewById(R.id.switch_dark_theme)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(mToolbar)
     }
 
 
-    private fun drawerNavigationToggle() {
+    private fun setDrawerNavigationToggle() {
         val toggle = ActionBarDrawerToggle(
-            this, drawerLayout, toolbar,
+            this, mDrawerLayout, mToolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
-        drawerLayout.addDrawerListener(toggle)
+        mDrawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
     }
 
 
     private fun drawerNavigationItemSelectedListener() {
-        navigationView.setNavigationItemSelectedListener {
+        mNavigationView.setNavigationItemSelectedListener {
             when (it.itemId) {
 
                 R.id.nav_settings -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, settingsFragment)
+                        replace(R.id.fragment_container, mSettingsFragment)
                         addToBackStack(null)
                         commit()
-                        setToolbarTitle(settingsFragment)
+                        setToolbarTitle(mSettingsFragment)
                     }
                     closeDrawerLayout()
                     true
@@ -139,10 +137,10 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.nav_gallery -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, galleryFragment)
+                        replace(R.id.fragment_container, mGalleryFragment)
                         addToBackStack(null)
                         commit()
-                        setToolbarTitle(galleryFragment)
+                        setToolbarTitle(mGalleryFragment)
                     }
                     closeDrawerLayout()
                     true
@@ -150,46 +148,46 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-    }
+    } // drawerNavigationItemSelectedListener
 
 
     private fun bottomNavigationItemSelectedListener() {
-        bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
+        mBottomNavigation.setOnItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
 
                 R.id.portfolio -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, portfolioFragment)
+                        replace(R.id.fragment_container, mPortfolioFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    setToolbarTitle(portfolioFragment)
+                    setToolbarTitle(mPortfolioFragment)
                     true
                 }
 
                 R.id.add_new_item -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, addNewItemFragment)
+                        replace(R.id.fragment_container, mAddNewItemFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    setToolbarTitle(addNewItemFragment)
+                    setToolbarTitle(mAddNewItemFragment)
                     true
                 }
 
                 R.id.prices -> {
                     supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragmentContainer, apiPricesFragment)
+                        replace(R.id.fragment_container, mApiPricesFragment)
                         addToBackStack(null)
                         commit()
                     }
-                    setToolbarTitle(apiPricesFragment)
+                    setToolbarTitle(mApiPricesFragment)
                     true
                 }
                 else -> false
             }
         }
-    }
+    } // bottomNavigationItemSelectedListener
 
 
     private fun handleDarkModeSwitch() {
@@ -205,18 +203,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun setToolbarTitle(fragment: Fragment) {
         when(fragment) {
-            portfolioFragment -> toolbar.title = getString(R.string.menu_portfolio)
-            settingsFragment -> toolbar.title = getString(R.string.menu_settings)
-            addNewItemFragment -> toolbar.title = getString(R.string.menu_add_new_item)
-            galleryFragment -> toolbar.title = getString(R.string.menu_gallery)
-            apiPricesFragment -> toolbar.title = getString(R.string.menu_api_prices)
-            else -> toolbar.title = getString(R.string.app_name)
+            mPortfolioFragment -> mToolbar.title = getString(R.string.menu_portfolio)
+            mSettingsFragment -> mToolbar.title = getString(R.string.menu_settings)
+            mAddNewItemFragment -> mToolbar.title = getString(R.string.menu_add_new_item)
+            mGalleryFragment -> mToolbar.title = getString(R.string.menu_gallery)
+            mApiPricesFragment -> mToolbar.title = getString(R.string.menu_api_prices)
+            else -> mToolbar.title = getString(R.string.app_name)
         }
     }
 
 
     private fun closeDrawerLayout() {
-        drawerLayout.closeDrawer(GravityCompat.START)
+        mDrawerLayout.closeDrawer(GravityCompat.START)
     }
 
 

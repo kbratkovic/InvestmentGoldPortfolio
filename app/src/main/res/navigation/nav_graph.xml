@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/portfolio">
+
+    <fragment
+        android:id="@+id/add_new_item"
+        android:name="com.kbratkovic.investmentgoldportfolio.ui.fragments.AddNewItemFragment"
+        android:label="fragment_addnewitem"
+        tools:layout="@layout/fragment_addnewitem"/>
+    <fragment
+        android:id="@+id/portfolio"
+        android:name="com.kbratkovic.investmentgoldportfolio.ui.fragments.PortfolioFragment"
+        android:label="fragment_portfolio"
+        tools:layout="@layout/fragment_portfolio"/>
+    <fragment
+        android:id="@+id/prices"
+        android:name="com.kbratkovic.investmentgoldportfolio.ui.fragments.ApiPricesFragment"
+        android:label="fragment_api_prices"
+        tools:layout="@layout/fragment_api_prices" />
+</navigation>

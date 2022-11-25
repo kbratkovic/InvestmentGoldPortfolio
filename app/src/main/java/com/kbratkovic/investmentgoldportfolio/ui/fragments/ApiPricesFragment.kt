@@ -71,7 +71,6 @@ class ApiPricesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        hidePricesContainer()
         handleDropDownMenus()
         setDefaultValueInDropDownMenu()
 //        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, selectedCurrency)
