@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
+import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 import com.kbratkovic.investmentgoldportfolio.util.Constants
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
@@ -45,7 +47,8 @@ class PortfolioFragment : Fragment() {
     private var mSumInGrams = 0.0
     private var mSumInTroyOunce = 0.0
 
-    private var mTotalValue = BigDecimal.ZERO
+    private var mTotalValueInUSD = BigDecimal.ZERO
+    private var mTotalValueInEUR = BigDecimal.ZERO
 
     private val mLocaleEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
@@ -73,6 +76,7 @@ class PortfolioFragment : Fragment() {
         getValuesFromDropdownMenus()
         observeInvestmentItemsChange()
         observeCurrentGoldPriceChange()
+//        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
 
@@ -80,7 +84,8 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, mSelectedCurrency)
+//        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, mSelectedCurrency)
+//        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
 
     } // onResume
 
@@ -140,31 +145,39 @@ class PortfolioFragment : Fragment() {
     }
 
 
-    private fun setTotalCurrentValue(pricePerGram: Double) {
-        mTotalValue = mSumInGrams.toBigDecimal().multiply(pricePerGram.toBigDecimal())
+    private fun setTotalCurrentValue(metalPrice: MetalPriceApiCom) {
+        val oneOztOfGoldInUSD = 1/metalPrice.rates.XAU
+        val oneGramOfGoldInUSD = oneOztOfGoldInUSD / Constants.CONVERT_TROY_OUNCE_CODE
+        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1/metalPrice.rates.EUR)
+
+        mTotalValueInUSD = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
+        mTotalValueInEUR = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
+
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                mTotalCurrentValue.text = mLocaleUS.format(mTotalValue)
+//                val value = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
+                mTotalCurrentValue.text = mLocaleUS.format(mTotalValueInUSD)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                mTotalCurrentValue.text = mLocaleEUR.format(mTotalValue)
+//                val value = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
+                mTotalCurrentValue.text = mLocaleEUR.format(mTotalValueInEUR)
             }
         }
-    }
+    } // setTotalCurrentValue
 
 
     private fun setTotalProfitValue() {
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                val totalProfit = mSumInUSD.minus(mTotalValue)
+                val totalProfit = mSumInUSD.minus(mTotalValueInUSD)
                 mTotalProfitValue.text = mLocaleUS.format(totalProfit)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                val totalProfit = mSumInEUR.minus(mTotalValue)
+                val totalProfit = mSumInEUR.minus(mTotalValueInEUR)
                 mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
             }
         }
-    }
+    } // setTotalProfitValue
 
 
 
@@ -186,12 +199,35 @@ class PortfolioFragment : Fragment() {
     } // observeInvestmentItemsChange
 
 
+//    private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
+//        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
+//            when (response) {
+//                is Resource.Success -> {
+//                    response.data?.let { metalPrice ->
+//                        setTotalCurrentValue(metalPrice)
+//                        setTotalProfitValue()
+//                    }
+//                }
+//                is Resource.Error -> {
+//                    response.message?.let { message ->
+//                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+//                        toast.show()
+//                        Timber.e(message)
+//                    }
+//                }
+//                is Resource.Loading -> {
+//                }
+//            }
+//        }
+//    } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
+
+
     private fun observeCurrentGoldPriceChange() {
         mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     response.data?.let { goldPrice ->
-                        setTotalCurrentValue(goldPrice.price_gram_24k)
+//                        setTotalCurrentValue(goldPrice.price_gram_24k)
                         setTotalProfitValue()
                     }
                 }

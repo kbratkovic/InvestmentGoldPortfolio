@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         handleDarkModeSwitch()
         setBottomNavigation()
 
+        mToolbar.title = getString(R.string.menu_portfolio)
     } // onCreate End
 
 
@@ -84,6 +85,18 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
         setupWithNavController(mBottomNavigation, navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if(destination.id == R.id.portfolio) {
+                setToolbarTitle(mPortfolioFragment)
+            }
+            if(destination.id == R.id.add_new_item) {
+                setToolbarTitle(mAddNewItemFragment)
+            }
+            if(destination.id == R.id.prices) {
+                setToolbarTitle(mApiPricesFragment)
+            }
+        }
     }
 
 
@@ -156,32 +169,37 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
 
                 R.id.portfolio -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mPortfolioFragment)
-                        addToBackStack(null)
-                        commit()
-                    }
                     setToolbarTitle(mPortfolioFragment)
+//                    supportFragmentManager.beginTransaction().apply {
+//                        replace(R.id.fragment_container, mPortfolioFragment)
+//                        addToBackStack(null)
+//                        commit()
+//                    }
+//                    setToolbarTitle(mPortfolioFragment)
                     true
                 }
 
                 R.id.add_new_item -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mAddNewItemFragment)
-                        addToBackStack(null)
-                        commit()
-                    }
                     setToolbarTitle(mAddNewItemFragment)
+
+//                    supportFragmentManager.beginTransaction().apply {
+//                        replace(R.id.fragment_container, mAddNewItemFragment)
+//                        addToBackStack(null)
+//                        commit()
+//                    }
+//                    setToolbarTitle(mAddNewItemFragment)
                     true
                 }
 
                 R.id.prices -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mApiPricesFragment)
-                        addToBackStack(null)
-                        commit()
-                    }
                     setToolbarTitle(mApiPricesFragment)
+
+//                    supportFragmentManager.beginTransaction().apply {
+//                        replace(R.id.fragment_container, mApiPricesFragment)
+//                        addToBackStack(null)
+//                        commit()
+//                    }
+//                    setToolbarTitle(mApiPricesFragment)
                     true
                 }
                 else -> false
