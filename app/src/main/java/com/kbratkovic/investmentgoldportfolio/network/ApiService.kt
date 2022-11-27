@@ -14,21 +14,21 @@ import retrofit2.http.Query
 interface ApiService {
 
     // GoldAPI.io
-    @Headers("x-access-token: $GOLD_PRICE_API_KEY")
-    @GET("{symbol}/{currency}")
-    suspend fun getCurrentGoldPrice(
-        @Path("symbol") symbol: String = "XAU",
-        @Path("currency") currency: String = "EUR"
-    ): Response<GoldPriceResponse>
+//    @Headers("x-access-token: $GOLD_PRICE_API_KEY")
+//    @GET("{symbol}/{currency}")
+//    suspend fun getCurrentGoldPrice(
+//        @Path("symbol") symbol: String = "XAU",
+//        @Path("currency") currency: String = "EUR"
+//    ): Response<GoldPriceResponse>
 
 
     // metalpriceapi.com
-//    @GET("https://api.metalpriceapi.com/v1/latest/")
-//    suspend fun getCurrentGoldPriceFromMetalPriceApiCom(
-//        @Query("api_key") api_key: String,
-//        @Query("base") base: String,
-//        @Query("currencies") currencies: String
-//    ): Response<MetalPriceApiComResponse>
+    @GET("https://api.metalpriceapi.com/v1/latest/")
+    suspend fun getCurrentGoldPriceFromMetalPriceApiCom(
+        @Query("api_key") api_key: String,
+        @Query("base") base: String,
+        @Query("currencies") currencies: String
+    ): Response<MetalPriceApiComResponse>
 
 
 

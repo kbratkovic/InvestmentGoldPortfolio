@@ -42,8 +42,8 @@ class MainViewModel(
 //    private val _allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
-    private val _currentGoldPrice: MutableLiveData<Resource<GoldPrice>> = MutableLiveData()
-    val currentGoldPrice: LiveData<Resource<GoldPrice>> = _currentGoldPrice
+//    private val _currentGoldPrice: MutableLiveData<Resource<GoldPrice>> = MutableLiveData()
+//    val currentGoldPrice: LiveData<Resource<GoldPrice>> = _currentGoldPrice
 
     private val _currentGoldPriceFromMetalPriceApiCom: MutableLiveData<Resource<MetalPriceApiCom>> = MutableLiveData()
     val currentGoldPriceFromMetalPriceApiCom: LiveData<Resource<MetalPriceApiCom>> = _currentGoldPriceFromMetalPriceApiCom
@@ -56,36 +56,12 @@ class MainViewModel(
 
 
     // Current Gold Price
-    fun getCurrentGoldPrice(symbol: String, currency: String) = viewModelScope.launch {
-        _currentGoldPrice.postValue(Resource.Loading())
-
-        try {
-            val response = repository.getCurrentGoldPrice(symbol, currency)
-            _currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
-        } catch (e: SocketTimeoutException) {
-            Timber.e(e.localizedMessage)
-            mOnDataChangeListener?.onDataChanged(context.getString(R.string.network_error))
-        }
-
-    }
-
-    private fun handleCurrentGoldPriceResponse(response: Response<GoldPriceResponse>) : Resource<GoldPrice> {
-        if (response.isSuccessful) {
-            response.body()?.let { goldPrice ->
-                return Resource.Success(GoldPriceMapper.buildFrom(goldPrice))
-            }
-        }
-        return Resource.Error(response.message())
-    }
-
-
-    // Current Gold Price From MetalPriceApi.com
-//    fun getCurrentGoldPriceFromMetalPriceApiCom() = viewModelScope.launch {
-//        _currentGoldPriceFromMetalPriceApiCom.postValue(Resource.Loading())
+//    fun getCurrentGoldPrice(symbol: String, currency: String) = viewModelScope.launch {
+//        _currentGoldPrice.postValue(Resource.Loading())
 //
 //        try {
-//            val response = repository.getCurrentGoldPriceFromMetalPriceApiCom(Constants.METAL_PRICE_API_COM_KEY, Constants.CURRENCY_USD_CODE, "${Constants.CURRENCY_EUR_CODE},${Constants.GOLD_CODE}")
-//            _currentGoldPriceFromMetalPriceApiCom.postValue(handleCurrentGoldPriceFromMetalPriceApiCo(response))
+//            val response = repository.getCurrentGoldPrice(symbol, currency)
+//            _currentGoldPrice.postValue(handleCurrentGoldPriceResponse(response))
 //        } catch (e: SocketTimeoutException) {
 //            Timber.e(e.localizedMessage)
 //            mOnDataChangeListener?.onDataChanged(context.getString(R.string.network_error))
@@ -93,14 +69,37 @@ class MainViewModel(
 //
 //    }
 //
-//    private fun handleCurrentGoldPriceFromMetalPriceApiCo(response: Response<MetalPriceApiComResponse>) : Resource<MetalPriceApiCom> {
+//    private fun handleCurrentGoldPriceResponse(response: Response<GoldPriceResponse>) : Resource<GoldPrice> {
 //        if (response.isSuccessful) {
 //            response.body()?.let { goldPrice ->
-//                return Resource.Success(MetalPriceApiComMapper.buildFrom(goldPrice))
+//                return Resource.Success(GoldPriceMapper.buildFrom(goldPrice))
 //            }
 //        }
 //        return Resource.Error(response.message())
 //    }
+
+
+    // Current Gold Price From MetalPriceApi.com
+    fun getCurrentGoldPriceFromMetalPriceApiCom() = viewModelScope.launch {
+        _currentGoldPriceFromMetalPriceApiCom.postValue(Resource.Loading())
+
+        try {
+            val response = repository.getCurrentGoldPriceFromMetalPriceApiCom(Constants.METAL_PRICE_API_COM_KEY, Constants.CURRENCY_USD_CODE, "${Constants.CURRENCY_EUR_CODE},${Constants.GOLD_CODE}")
+            _currentGoldPriceFromMetalPriceApiCom.postValue(handleCurrentGoldPriceFromMetalPriceApiCo(response))
+        } catch (e: SocketTimeoutException) {
+            Timber.e(e.localizedMessage)
+            mOnDataChangeListener?.onDataChanged(context.getString(R.string.network_error))
+        }
+    }
+
+    private fun handleCurrentGoldPriceFromMetalPriceApiCo(response: Response<MetalPriceApiComResponse>) : Resource<MetalPriceApiCom> {
+        if (response.isSuccessful) {
+            response.body()?.let { goldPrice ->
+                return Resource.Success(MetalPriceApiComMapper.buildFrom(goldPrice))
+            }
+        }
+        return Resource.Error(response.message())
+    }
 
 
     // Currency Rates base EUR

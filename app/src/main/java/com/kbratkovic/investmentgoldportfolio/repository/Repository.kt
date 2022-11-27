@@ -23,13 +23,13 @@ class Repository(
 
 
     // api
-    suspend fun getCurrentGoldPrice(symbol: String, currency: String): Response<GoldPriceResponse> {
-        return RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
-    }
-
-//    suspend fun getCurrentGoldPriceFromMetalPriceApiCom(api_key: String, base: String, currencies: String): Response<MetalPriceApiComResponse> {
-//        return RetrofitInstance.api.getCurrentGoldPriceFromMetalPriceApiCom(api_key, base, currencies)
+//    suspend fun getCurrentGoldPrice(symbol: String, currency: String): Response<GoldPriceResponse> {
+//        return RetrofitInstance.api.getCurrentGoldPrice(symbol, currency)
 //    }
+
+    suspend fun getCurrentGoldPriceFromMetalPriceApiCom(api_key: String, base: String, currencies: String): Response<MetalPriceApiComResponse> {
+        return RetrofitInstance.api.getCurrentGoldPriceFromMetalPriceApiCom(api_key, base, currencies)
+    }
 
 
     suspend fun getCurrencyRatesBaseEUR() =
