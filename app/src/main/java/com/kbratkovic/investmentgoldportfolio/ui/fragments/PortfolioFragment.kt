@@ -40,6 +40,13 @@ class PortfolioFragment : Fragment() {
     private lateinit var mTotalCurrentValue: TextView
     private lateinit var mTotalProfitValue: TextView
 
+    private var mPriceOfOneOztOfGoldInUSD = 0.0
+    private var mPriceOfOneOztOfGoldInEUR = 0.0
+    private var mPriceOfOneGramOfGoldInUSD = 0.0
+    private var mPriceOfOneGramOfGoldInEUR = 0.0
+    private var mExchangeRateUSD = 0.0
+    private var mExchangeRateEUR = 0.0
+
     private var mTotalPurchasePriceInEUR = BigDecimal.ZERO
     private var mTotalPurchasePriceInUSD = BigDecimal.ZERO
     private var mTotalWeightInGrams = 0.0
@@ -95,9 +102,6 @@ class PortfolioFragment : Fragment() {
             ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
         mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        val arrayAdapterWeight =
-            ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
-        mAutoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
 
         mAutoCompleteTextViewCurrency.onItemClickListener =
             object : AdapterView.OnItemClickListener {
@@ -106,9 +110,16 @@ class PortfolioFragment : Fragment() {
                         mSelectedCurrency = p0?.getItemAtPosition(p2) as String
 
                         setTotalPurchasePrice()
+                        setTotalCurrentValue()
+                        setTotalProfitValue()
                     }
                 }
             }
+
+
+        val arrayAdapterWeight =
+            ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
+        mAutoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
 
         mAutoCompleteTextViewWeight.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -153,13 +164,16 @@ class PortfolioFragment : Fragment() {
     }
 
 
-    private fun setTotalCurrentValue(metalPrice: MetalPriceApiCom) {
-        val oneOztOfGoldInUSD = 1 / metalPrice.rates.XAU
-        val oneGramOfGoldInUSD = oneOztOfGoldInUSD / Constants.CONVERT_TROY_OUNCE_CODE
-        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1 / metalPrice.rates.EUR)
+    private fun setTotalCurrentValue() {
+//        val oneOztOfGoldInUSD = 1 / metalPrice.rates.XAU
+//        val oneGramOfGoldInUSD = oneOztOfGoldInUSD / Constants.CONVERT_TROY_OUNCE_CODE
+//        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1 / metalPrice.rates.EUR)
 
-        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
-        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
+//        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
+//        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
+
+        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInUSD.toBigDecimal())
+        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInEUR.toBigDecimal())
 
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
@@ -186,6 +200,17 @@ class PortfolioFragment : Fragment() {
     } // setTotalProfitValue
 
 
+    private fun calculateExchangeRatesAndGoldPrices(metalPrice: MetalPriceApiCom) {
+        mExchangeRateUSD = (1).div(metalPrice.rates.EUR)
+        mExchangeRateEUR = metalPrice.rates.EUR
+
+        mPriceOfOneOztOfGoldInUSD = (1).div(metalPrice.rates.XAU)
+        mPriceOfOneOztOfGoldInEUR = (1).div(metalPrice.rates.XAU).times(mExchangeRateEUR)
+        mPriceOfOneGramOfGoldInUSD = mPriceOfOneOztOfGoldInUSD.div(Constants.CONVERT_TROY_OUNCE_CODE)
+        mPriceOfOneGramOfGoldInEUR = mPriceOfOneOztOfGoldInEUR.div(Constants.CONVERT_TROY_OUNCE_CODE)
+    } // calculateExchangeRatesAndGoldPrices
+
+
     private fun observeInvestmentItemsChange() {
         mMainViewModel.allInvestmentItems.observe(viewLifecycleOwner) { listOfInvestmentItems ->
             mPortfolioAdapter.sendDataToAdapter(listOfInvestmentItems)
@@ -209,7 +234,8 @@ class PortfolioFragment : Fragment() {
             when (response) {
                 is Resource.Success -> {
                     response.data?.let { metalPrice ->
-                        setTotalCurrentValue(metalPrice)
+                        calculateExchangeRatesAndGoldPrices(metalPrice)
+                        setTotalCurrentValue()
                         setTotalProfitValue()
                     }
                 }
