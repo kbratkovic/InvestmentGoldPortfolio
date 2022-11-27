@@ -47,6 +47,7 @@
     <string name="total_profit">Total Profit:</string>
 
     <string name="total_weight_value">%1$s %2$s</string>
+    <string name="price_holder">0</string>
 
 
 </resources>
