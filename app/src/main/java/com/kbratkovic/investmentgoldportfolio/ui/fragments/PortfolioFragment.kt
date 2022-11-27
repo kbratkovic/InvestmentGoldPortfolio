@@ -11,12 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 import com.kbratkovic.investmentgoldportfolio.util.Constants
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import timber.log.Timber
 import java.math.BigDecimal
@@ -42,10 +40,10 @@ class PortfolioFragment : Fragment() {
     private lateinit var mTotalCurrentValue: TextView
     private lateinit var mTotalProfitValue: TextView
 
-    private var mSumInEUR = BigDecimal.ZERO
-    private var mSumInUSD = BigDecimal.ZERO
-    private var mSumInGrams = 0.0
-    private var mSumInTroyOunce = 0.0
+    private var mTotalPurchasePriceInEUR = BigDecimal.ZERO
+    private var mTotalPurchasePriceInUSD = BigDecimal.ZERO
+    private var mTotalWeightInGrams = 0.0
+    private var mTotalWeightInTroyOunce = 0.0
 
     private var mTotalValueInUSD = BigDecimal.ZERO
     private var mTotalValueInEUR = BigDecimal.ZERO
@@ -54,7 +52,6 @@ class PortfolioFragment : Fragment() {
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
 
     private val mMainViewModel: MainViewModel by activityViewModels()
-
 
 
     override fun onCreateView(
@@ -75,8 +72,8 @@ class PortfolioFragment : Fragment() {
         handleRecyclerView()
         getValuesFromDropdownMenus()
         observeInvestmentItemsChange()
-        observeCurrentGoldPriceChange()
-//        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
+//        observeCurrentGoldPriceChange()
+        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
 
@@ -85,7 +82,7 @@ class PortfolioFragment : Fragment() {
         super.onResume()
         handleDropDownMenus()
 //        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, mSelectedCurrency)
-//        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
+        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
 
     } // onResume
 
@@ -94,23 +91,26 @@ class PortfolioFragment : Fragment() {
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
         val weightDropdownList = resources.getStringArray(R.array.weight_items)
 
-        val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
+        val arrayAdapterCurrency =
+            ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
         mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
+        val arrayAdapterWeight =
+            ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
         mAutoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
 
-        mAutoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (p2 >= 0) {
-                    mSelectedCurrency = p0?.getItemAtPosition(p2) as String
+        mAutoCompleteTextViewCurrency.onItemClickListener =
+            object : AdapterView.OnItemClickListener {
+                override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    if (p2 >= 0) {
+                        mSelectedCurrency = p0?.getItemAtPosition(p2) as String
 
-                    setTotalPurchasePrice()
+                        setTotalPurchasePrice()
+                    }
                 }
             }
-        }
 
-        mAutoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
+        mAutoCompleteTextViewWeight.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 mSelectedWeight = p0?.getItemAtPosition(p2) as String
                 setTotalWeight()
@@ -122,10 +122,10 @@ class PortfolioFragment : Fragment() {
     private fun setTotalPurchasePrice() {
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                mTotalPurchasePriceValue.text = mLocaleUS.format(mSumInUSD)
+                mTotalPurchasePriceValue.text = mLocaleUS.format(mTotalPurchasePriceInUSD)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                mTotalPurchasePriceValue.text = mLocaleEUR.format(mSumInEUR)
+                mTotalPurchasePriceValue.text = mLocaleEUR.format(mTotalPurchasePriceInEUR)
             }
         }
     }
@@ -135,31 +135,37 @@ class PortfolioFragment : Fragment() {
         when (mSelectedWeight) {
             Constants.WEIGHT_GRAM_CODE -> {
                 mTotalWeightValue.text =
-                    getString(R.string.total_weight_value, BigDecimal(mSumInGrams).setScale(2, RoundingMode.HALF_EVEN).toString(), Constants.WEIGHT_GRAM_SHORT_CODE)
+                    getString(
+                        R.string.total_weight_value,
+                        BigDecimal(mTotalWeightInGrams).setScale(2, RoundingMode.HALF_EVEN).toString(),
+                        Constants.WEIGHT_GRAM_SHORT_CODE
+                    )
             }
             Constants.WEIGHT_TROY_OUNCE_CODE -> {
                 mTotalWeightValue.text =
-                    getString(R.string.total_weight_value, BigDecimal(mSumInTroyOunce).setScale(2, RoundingMode.HALF_EVEN).toString(), Constants.WEIGHT_TROY_OUNCE_SHORT_CODE)
+                    getString(
+                        R.string.total_weight_value,
+                        BigDecimal(mTotalWeightInTroyOunce).setScale(2, RoundingMode.HALF_EVEN).toString(),
+                        Constants.WEIGHT_TROY_OUNCE_SHORT_CODE
+                    )
             }
         }
     }
 
 
     private fun setTotalCurrentValue(metalPrice: MetalPriceApiCom) {
-        val oneOztOfGoldInUSD = 1/metalPrice.rates.XAU
+        val oneOztOfGoldInUSD = 1 / metalPrice.rates.XAU
         val oneGramOfGoldInUSD = oneOztOfGoldInUSD / Constants.CONVERT_TROY_OUNCE_CODE
-        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1/metalPrice.rates.EUR)
+        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1 / metalPrice.rates.EUR)
 
-        mTotalValueInUSD = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
-        mTotalValueInEUR = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
+        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
+        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
 
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-//                val value = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
                 mTotalCurrentValue.text = mLocaleUS.format(mTotalValueInUSD)
             }
             Constants.CURRENCY_EUR_CODE -> {
-//                val value = mSumInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
                 mTotalCurrentValue.text = mLocaleEUR.format(mTotalValueInEUR)
             }
         }
@@ -169,16 +175,15 @@ class PortfolioFragment : Fragment() {
     private fun setTotalProfitValue() {
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                val totalProfit = mSumInUSD.minus(mTotalValueInUSD)
+                val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
                 mTotalProfitValue.text = mLocaleUS.format(totalProfit)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                val totalProfit = mSumInEUR.minus(mTotalValueInEUR)
+                val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
                 mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
             }
         }
     } // setTotalProfitValue
-
 
 
     private fun observeInvestmentItemsChange() {
@@ -187,10 +192,10 @@ class PortfolioFragment : Fragment() {
 
             for (item in listOfInvestmentItems) {
                 clearDisplayedData()
-                mSumInEUR = mSumInEUR.add(item.purchasePriceInEUR)
-                mSumInUSD = mSumInUSD.add(item.purchasePriceInUSD)
-                mSumInGrams = mSumInGrams.plus(item.weightInGrams)
-                mSumInTroyOunce = mSumInTroyOunce.plus(item.weightInTroyOunce)
+                mTotalPurchasePriceInEUR = mTotalPurchasePriceInEUR.add(item.purchasePriceInEUR)
+                mTotalPurchasePriceInUSD = mTotalPurchasePriceInUSD.add(item.purchasePriceInUSD)
+                mTotalWeightInGrams = mTotalWeightInGrams.plus(item.weightInGrams)
+                mTotalWeightInTroyOunce = mTotalWeightInTroyOunce.plus(item.weightInTroyOunce)
             }
 
             setTotalPurchasePrice()
@@ -199,35 +204,12 @@ class PortfolioFragment : Fragment() {
     } // observeInvestmentItemsChange
 
 
-//    private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
-//        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
-//            when (response) {
-//                is Resource.Success -> {
-//                    response.data?.let { metalPrice ->
-//                        setTotalCurrentValue(metalPrice)
-//                        setTotalProfitValue()
-//                    }
-//                }
-//                is Resource.Error -> {
-//                    response.message?.let { message ->
-//                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-//                        toast.show()
-//                        Timber.e(message)
-//                    }
-//                }
-//                is Resource.Loading -> {
-//                }
-//            }
-//        }
-//    } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
-
-
-    private fun observeCurrentGoldPriceChange() {
-        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
+    private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
+        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
-                    response.data?.let { goldPrice ->
-//                        setTotalCurrentValue(goldPrice.price_gram_24k)
+                    response.data?.let { metalPrice ->
+                        setTotalCurrentValue(metalPrice)
                         setTotalProfitValue()
                     }
                 }
@@ -242,14 +224,37 @@ class PortfolioFragment : Fragment() {
                 }
             }
         }
-    } // observeCurrentGoldPriceChange
+    } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
+
+
+//    private fun observeCurrentGoldPriceChange() {
+//        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
+//            when (response) {
+//                is Resource.Success -> {
+//                    response.data?.let { goldPrice ->
+////                        setTotalCurrentValue(goldPrice.price_gram_24k)
+//                        setTotalProfitValue()
+//                    }
+//                }
+//                is Resource.Error -> {
+//                    response.message?.let { message ->
+//                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
+//                        toast.show()
+//                        Timber.e(message)
+//                    }
+//                }
+//                is Resource.Loading -> {
+//                }
+//            }
+//        }
+//    } // observeCurrentGoldPriceChange
 
 
     private fun clearDisplayedData() {
-        mSumInEUR = BigDecimal.ZERO
-        mSumInUSD = BigDecimal.ZERO
-        mSumInGrams = 0.0
-        mSumInTroyOunce = 0.0
+        mTotalPurchasePriceInEUR = BigDecimal.ZERO
+        mTotalPurchasePriceInUSD = BigDecimal.ZERO
+        mTotalWeightInGrams = 0.0
+        mTotalWeightInTroyOunce = 0.0
     }
 
 
@@ -275,7 +280,6 @@ class PortfolioFragment : Fragment() {
         mRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         mRecyclerView.adapter = mPortfolioAdapter
     }
-
 
 
 }
