@@ -9,4 +9,10 @@
     <style name="portfolio_value_holder">
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="item_portfolio_adapter">
+        <item name="android:layout_marginStart">8sp</item>
+        <item name="android:layout_marginBottom">5sp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
 </resources>

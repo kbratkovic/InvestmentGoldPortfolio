@@ -51,27 +51,13 @@ class MainActivity : AppCompatActivity() {
 
         initializeTimberLogging()
         initializeViewModel()
-        startOnDataChangeListener()
         initializeViews()
         setDrawerNavigationToggle()
         drawerNavigationItemSelectedListener()
 //        bottomNavigationItemSelectedListener()
         handleDarkModeSwitch()
         setBottomNavigation()
-
-        mToolbar.title = getString(R.string.menu_portfolio)
     } // onCreate End
-
-
-    private fun startOnDataChangeListener() {
-        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
-            override fun onDataChanged(message: String?) {
-                if (message.equals(getString(R.string.network_error))) {
-                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-    }
 
 
     private fun initializeTimberLogging() {

@@ -43,11 +43,17 @@
     <string name="zero_value">0</string>
     <string name="total_purchase_price">Total Purchase Price:</string>
     <string name="total_weight">Total Weight:</string>
-    <string name="total_current_value">Total Current Value:</string>
+    <string name="current_market_value">Current Market Value:</string>
     <string name="total_profit">Total Profit:</string>
 
     <string name="total_weight_value">%1$s %2$s</string>
     <string name="price_holder">0</string>
+
+    <string name="total_weight_holder">Weight purchased: %1$s %2$s</string>
+    <string name="total_units_purchased_holder">Units purchased: %1$s</string>
+    <string name="total_purchase_price_holder">Total price: %1$s</string>
+
+
 
 
 </resources>

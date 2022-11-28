@@ -48,11 +48,11 @@ class MainViewModel(
     private val _currentGoldPriceFromMetalPriceApiCom: MutableLiveData<Resource<MetalPriceApiCom>> = MutableLiveData()
     val currentGoldPriceFromMetalPriceApiCom: LiveData<Resource<MetalPriceApiCom>> = _currentGoldPriceFromMetalPriceApiCom
 
-    private val _currencyRatesBaseEUR: MutableLiveData<Resource<CurrencyRates>> = MutableLiveData()
-    val currencyRatesBaseEUR: LiveData<Resource<CurrencyRates>> = _currencyRatesBaseEUR
-
-    private val _currencyRatesBaseUSD: MutableLiveData<Resource<CurrencyRates>> = MutableLiveData()
-    val currencyRatesBaseUSD: LiveData<Resource<CurrencyRates>> = _currencyRatesBaseUSD
+//    private val _currencyRatesBaseEUR: MutableLiveData<Resource<CurrencyRates>> = MutableLiveData()
+//    val currencyRatesBaseEUR: LiveData<Resource<CurrencyRates>> = _currencyRatesBaseEUR
+//
+//    private val _currencyRatesBaseUSD: MutableLiveData<Resource<CurrencyRates>> = MutableLiveData()
+//    val currencyRatesBaseUSD: LiveData<Resource<CurrencyRates>> = _currencyRatesBaseUSD
 
 
     // Current Gold Price
@@ -95,7 +95,10 @@ class MainViewModel(
     private fun handleCurrentGoldPriceFromMetalPriceApiCo(response: Response<MetalPriceApiComResponse>) : Resource<MetalPriceApiCom> {
         if (response.isSuccessful) {
             response.body()?.let { goldPrice ->
-                return Resource.Success(MetalPriceApiComMapper.buildFrom(goldPrice))
+                if (goldPrice.success)
+                    return Resource.Success(MetalPriceApiComMapper.buildFrom(goldPrice))
+                else
+                    return Resource.Error(response.message())
             }
         }
         return Resource.Error(response.message())
@@ -103,49 +106,49 @@ class MainViewModel(
 
 
     // Currency Rates base EUR
-    fun getCurrencyRatesBaseEUR() = viewModelScope.launch {
-
-        try {
-            val response = repository.getCurrencyRatesBaseEUR()
-            _currencyRatesBaseEUR.postValue(handleCurrencyRatesBaseEurResponse(response))
-        } catch (e: SocketTimeoutException) {
-            Timber.e(e.localizedMessage)
-            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
-        }
-
-    }
-
-    private fun handleCurrencyRatesBaseEurResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
-        if (response.isSuccessful) {
-            response.body()?.let { currencyRatesResponse ->
-                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
-            }
-        }
-        return Resource.Error(response.message())
-    }
+//    fun getCurrencyRatesBaseEUR() = viewModelScope.launch {
+//
+//        try {
+//            val response = repository.getCurrencyRatesBaseEUR()
+//            _currencyRatesBaseEUR.postValue(handleCurrencyRatesBaseEurResponse(response))
+//        } catch (e: SocketTimeoutException) {
+//            Timber.e(e.localizedMessage)
+//            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
+//        }
+//
+//    }
+//
+//    private fun handleCurrencyRatesBaseEurResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
+//        if (response.isSuccessful) {
+//            response.body()?.let { currencyRatesResponse ->
+//                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
+//            }
+//        }
+//        return Resource.Error(response.message())
+//    }
 
 
     // Currency Rates base USD
-    fun getCurrencyRatesBaseUSD() = viewModelScope.launch {
-
-        try {
-            val response = repository.getCurrencyRatesBaseUSD()
-            _currencyRatesBaseUSD.postValue(handleCurrencyRatesBaseUsdResponse(response))
-        } catch (e: SocketTimeoutException) {
-            Timber.e(e.localizedMessage)
-            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
-        }
-
-    }
-
-    private fun handleCurrencyRatesBaseUsdResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
-        if (response.isSuccessful) {
-            response.body()?.let { currencyRatesResponse ->
-                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
-            }
-        }
-        return Resource.Error(response.message())
-    }
+//    fun getCurrencyRatesBaseUSD() = viewModelScope.launch {
+//
+//        try {
+//            val response = repository.getCurrencyRatesBaseUSD()
+//            _currencyRatesBaseUSD.postValue(handleCurrencyRatesBaseUsdResponse(response))
+//        } catch (e: SocketTimeoutException) {
+//            Timber.e(e.localizedMessage)
+//            mOnDataChangeListener?.onDataChanged( context.getString(R.string.network_error))
+//        }
+//
+//    }
+//
+//    private fun handleCurrencyRatesBaseUsdResponse(response: Response<CurrencyExchangeRatesResponse>) : Resource<CurrencyRates> {
+//        if (response.isSuccessful) {
+//            response.body()?.let { currencyRatesResponse ->
+//                return Resource.Success(CurrencyExchangeRatesMapper.buildFrom(currencyRatesResponse))
+//            }
+//        }
+//        return Resource.Error(response.message())
+//    }
 
 
     // Add New Gold Item To DB

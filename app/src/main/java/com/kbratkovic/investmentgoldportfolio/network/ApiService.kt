@@ -33,17 +33,17 @@ interface ApiService {
 
 
     // anyapi.io
-    @GET("https://anyapi.io/api/v1/exchange/rates/")
-    suspend fun getCurrencyRatesBaseEUR(
-        @Query("base") baseCurrency: String,
-        @Query("apiKey") apiKey: String
-    ): Response<CurrencyExchangeRatesResponse>
-
-
-    @GET("https://anyapi.io/api/v1/exchange/rates/")
-    suspend fun getCurrencyRatesBaseUSD(
-        @Query("base") baseCurrency: String,
-        @Query("apiKey") apiKey: String
-    ): Response<CurrencyExchangeRatesResponse>
+//    @GET("https://anyapi.io/api/v1/exchange/rates/")
+//    suspend fun getCurrencyRatesBaseEUR(
+//        @Query("base") baseCurrency: String,
+//        @Query("apiKey") apiKey: String
+//    ): Response<CurrencyExchangeRatesResponse>
+//
+//
+//    @GET("https://anyapi.io/api/v1/exchange/rates/")
+//    suspend fun getCurrencyRatesBaseUSD(
+//        @Query("base") baseCurrency: String,
+//        @Query("apiKey") apiKey: String
+//    ): Response<CurrencyExchangeRatesResponse>
 
 }

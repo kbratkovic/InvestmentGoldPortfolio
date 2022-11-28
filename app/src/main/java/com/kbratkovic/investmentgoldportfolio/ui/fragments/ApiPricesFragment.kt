@@ -68,7 +68,7 @@ class ApiPricesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeLayoutViews(view)
-        startOnDataChangeListener()
+//        startOnDataChangeListener()
         setDefaultValueInDropDownMenu()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
     } // onViewCreated
@@ -93,15 +93,15 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun startOnDataChangeListener() {
-        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
-            override fun onDataChanged(message: String?) {
-                if (message.equals(getString(R.string.network_error))) {
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-    }
+//    private fun startOnDataChangeListener() {
+//        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
+//            override fun onDataChanged(message: String?) {
+//                if (message.equals(getString(R.string.network_error))) {
+//                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        })
+//    }
 
 
     private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
@@ -28,17 +29,19 @@ class PortfolioFragment : Fragment() {
 
     private var mSelectedCurrency: String = ""
     private var mSelectedWeight: String = ""
-    private var mDataSet: List<InvestmentItem> = listOf()
+    private var mDataSet: MutableList<InvestmentItem> = mutableListOf()
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mPortfolioAdapter: PortfolioAdapter
+
+    private lateinit var mLinearProgressIndicator: LinearProgressIndicator
 
     private lateinit var mAutoCompleteTextViewWeight: AutoCompleteTextView
     private lateinit var mAutoCompleteTextViewCurrency: AutoCompleteTextView
 
     private lateinit var mTotalPurchasePriceValue: TextView
     private lateinit var mTotalWeightValue: TextView
-    private lateinit var mTotalCurrentValue: TextView
+    private lateinit var mCurrentMarketValue: TextView
     private lateinit var mTotalProfitValue: TextView
 
     private var mPriceOfOneOztOfGoldInUSD = 0.0
@@ -55,6 +58,8 @@ class PortfolioFragment : Fragment() {
 
     private var mTotalValueInUSD = BigDecimal.ZERO
     private var mTotalValueInEUR = BigDecimal.ZERO
+
+    private var mApiResponse = false
 
     private val mLocaleEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
@@ -77,10 +82,11 @@ class PortfolioFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeLayoutViews(view)
-        handleRecyclerView()
+        startOnDataChangeListener()
         getValuesFromDropdownMenus()
+        handleRecyclerView()
         observeInvestmentItemsChange()
-        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
+//        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
 
@@ -88,9 +94,21 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
+//        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
 
     } // onResume
+
+
+    private fun startOnDataChangeListener() {
+        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
+            override fun onDataChanged(message: String?) {
+                if (message.equals(getString(R.string.network_error))) {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+                hideLinearProgressIndicator()
+            }
+        })
+    }
 
 
     private fun handleDropDownMenus() {
@@ -110,6 +128,7 @@ class PortfolioFragment : Fragment() {
                         setTotalPurchasePrice()
                         setTotalCurrentValue()
                         setTotalProfitValue()
+                        mPortfolioAdapter.sendDataToAdapter(mDataSet, mSelectedCurrency, mSelectedWeight)
                     }
                 }
             }
@@ -123,6 +142,7 @@ class PortfolioFragment : Fragment() {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 mSelectedWeight = p0?.getItemAtPosition(p2) as String
                 setTotalWeight()
+                mPortfolioAdapter.sendDataToAdapter(mDataSet, mSelectedCurrency, mSelectedWeight)
             }
         }
     } // handleDropDownMenus
@@ -168,32 +188,34 @@ class PortfolioFragment : Fragment() {
 
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                mTotalCurrentValue.text = mLocaleUS.format(mTotalValueInUSD)
+                mCurrentMarketValue.text = mLocaleUS.format(mTotalValueInUSD)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                mTotalCurrentValue.text = mLocaleEUR.format(mTotalValueInEUR)
+                mCurrentMarketValue.text = mLocaleEUR.format(mTotalValueInEUR)
             }
         }
     } // setTotalCurrentValue
 
 
     private fun setTotalProfitValue() {
-        when (mSelectedCurrency) {
-            Constants.CURRENCY_USD_CODE -> {
-                val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
-                if (totalProfit < BigDecimal.ZERO)
-                    mTotalProfitValue.setTextColor(Color.RED)
-                else if (totalProfit > BigDecimal.ZERO)
-                    mTotalProfitValue.setTextColor(Color.GREEN)
-                mTotalProfitValue.text = mLocaleUS.format(totalProfit)
-            }
-            Constants.CURRENCY_EUR_CODE -> {
-                val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
-                if (totalProfit < BigDecimal.ZERO)
-                    mTotalProfitValue.setTextColor(Color.RED)
-                else if (totalProfit > BigDecimal.ZERO)
-                    mTotalProfitValue.setTextColor(Color.GREEN)
-                mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
+        if (mApiResponse) {
+            when (mSelectedCurrency) {
+                Constants.CURRENCY_USD_CODE -> {
+                    val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
+                    if (totalProfit < BigDecimal.ZERO)
+                        mTotalProfitValue.setTextColor(Color.RED)
+                    else if (totalProfit > BigDecimal.ZERO)
+                        mTotalProfitValue.setTextColor(Color.GREEN)
+                    mTotalProfitValue.text = mLocaleUS.format(totalProfit)
+                }
+                Constants.CURRENCY_EUR_CODE -> {
+                    val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
+                    if (totalProfit < BigDecimal.ZERO)
+                        mTotalProfitValue.setTextColor(Color.RED)
+                    else if (totalProfit > BigDecimal.ZERO)
+                        mTotalProfitValue.setTextColor(Color.GREEN)
+                    mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
+                }
             }
         }
     } // setTotalProfitValue
@@ -212,10 +234,11 @@ class PortfolioFragment : Fragment() {
 
     private fun observeInvestmentItemsChange() {
         mMainViewModel.allInvestmentItems.observe(viewLifecycleOwner) { listOfInvestmentItems ->
-            mPortfolioAdapter.sendDataToAdapter(listOfInvestmentItems)
+            mDataSet.addAll(listOfInvestmentItems)
+            mPortfolioAdapter.sendDataToAdapter(mDataSet, mSelectedCurrency, mSelectedWeight)
 
-            for (item in listOfInvestmentItems) {
-                clearDisplayedData()
+            for (item in mDataSet) {
+//                clearDisplayedData()
                 mTotalPurchasePriceInEUR = mTotalPurchasePriceInEUR.add(item.purchasePriceInEUR)
                 mTotalPurchasePriceInUSD = mTotalPurchasePriceInUSD.add(item.purchasePriceInUSD)
                 mTotalWeightInGrams = mTotalWeightInGrams.plus(item.weightInGrams)
@@ -232,7 +255,9 @@ class PortfolioFragment : Fragment() {
         mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
+                    hideLinearProgressIndicator()
                     response.data?.let { metalPrice ->
+                        mApiResponse = true
                         calculateExchangeRatesAndGoldPrices(metalPrice)
                         setTotalCurrentValue()
                         setTotalProfitValue()
@@ -240,12 +265,15 @@ class PortfolioFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     response.message?.let { message ->
+                        mApiResponse = false
+                        hideLinearProgressIndicator()
                         val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
                         toast.show()
                         Timber.e(message)
                     }
                 }
                 is Resource.Loading -> {
+                    showLinearProgressIndicator()
                 }
             }
         }
@@ -268,20 +296,30 @@ class PortfolioFragment : Fragment() {
 
     private fun initializeLayoutViews(view: View) {
         mRecyclerView = view.findViewById(R.id.recyclerView)
+        mLinearProgressIndicator = view.findViewById(R.id.linear_progress_indicator)
         mAutoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
         mAutoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
         mTotalPurchasePriceValue = view.findViewById(R.id.total_purchase_price_value)
         mTotalWeightValue = view.findViewById(R.id.total_weight_value)
-        mTotalCurrentValue = view.findViewById(R.id.total_current_value_value)
+        mCurrentMarketValue = view.findViewById(R.id.current_market_value_value)
         mTotalProfitValue = view.findViewById(R.id.total_profit_value)
     }
 
 
     private fun handleRecyclerView() {
-        mPortfolioAdapter = PortfolioAdapter(mDataSet)
+        mPortfolioAdapter = PortfolioAdapter(requireContext(), mDataSet, mSelectedCurrency, mSelectedWeight)
         mRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         mRecyclerView.adapter = mPortfolioAdapter
     }
 
+
+    private fun showLinearProgressIndicator() {
+        mLinearProgressIndicator.visibility = View.VISIBLE
+    }
+
+
+    fun hideLinearProgressIndicator() {
+        mLinearProgressIndicator.visibility = View.GONE
+    }
 
 }

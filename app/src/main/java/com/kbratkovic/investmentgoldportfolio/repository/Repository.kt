@@ -32,11 +32,11 @@ class Repository(
     }
 
 
-    suspend fun getCurrencyRatesBaseEUR() =
-        RetrofitInstance.api.getCurrencyRatesBaseEUR("EUR", RATES_API_KEY)
-
-
-    suspend fun getCurrencyRatesBaseUSD() =
-        RetrofitInstance.api.getCurrencyRatesBaseUSD("USD", RATES_API_KEY)
+//    suspend fun getCurrencyRatesBaseEUR() =
+//        RetrofitInstance.api.getCurrencyRatesBaseEUR("EUR", RATES_API_KEY)
+//
+//
+//    suspend fun getCurrencyRatesBaseUSD() =
+//        RetrofitInstance.api.getCurrencyRatesBaseUSD("USD", RATES_API_KEY)
 
 }

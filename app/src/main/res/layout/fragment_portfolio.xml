@@ -6,6 +6,15 @@
     android:layout_height="wrap_content"
     tools:context=".ui.fragments.PortfolioFragment">
 
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/linear_progress_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/menu_currency"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -15,7 +24,7 @@
         android:layout_marginStart="20dp"
         android:hint="@string/currency"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@id/linear_progress_indicator">
 
         <AutoCompleteTextView
             android:id="@+id/auto_complete_text_view_currency"
@@ -37,7 +46,7 @@
         android:layout_marginEnd="20dp"
         android:hint="@string/weight"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@+id/linear_progress_indicator">
 
         <AutoCompleteTextView
             android:id="@+id/auto_complete_text_view_weight"
@@ -90,7 +99,7 @@
             android:layout_height="wrap_content"
             android:text="@string/total_weight"
             style="@style/portfolio_text_holder"
-            app:layout_constraintBottom_toTopOf="@+id/total_current_value"
+            app:layout_constraintBottom_toTopOf="@+id/current_market_value"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/total_purchase_price" />
 
@@ -100,23 +109,23 @@
             android:layout_height="wrap_content"
             android:text="@string/zero_value"
             style="@style/portfolio_value_holder"
-            app:layout_constraintBottom_toTopOf="@+id/total_current_value_value"
+            app:layout_constraintBottom_toTopOf="@+id/current_market_value_value"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
             app:layout_constraintTop_toBottomOf="@+id/total_purchase_price_value" />
 
         <TextView
-            android:id="@+id/total_current_value"
+            android:id="@+id/current_market_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/total_current_value"
+            android:text="@string/current_market_value"
             style="@style/portfolio_text_holder"
             app:layout_constraintBottom_toTopOf="@+id/total_profit"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/total_weight" />
 
         <TextView
-            android:id="@+id/total_current_value_value"
+            android:id="@+id/current_market_value_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/zero_value"
@@ -134,7 +143,7 @@
             style="@style/portfolio_text_holder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/total_current_value" />
+            app:layout_constraintTop_toBottomOf="@+id/current_market_value" />
 
         <TextView
             android:id="@+id/total_profit_value"
@@ -145,7 +154,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline6"
-            app:layout_constraintTop_toBottomOf="@+id/total_current_value_value" />
+            app:layout_constraintTop_toBottomOf="@+id/current_market_value_value" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline6"
