@@ -1,5 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,7 +80,6 @@ class PortfolioFragment : Fragment() {
         handleRecyclerView()
         getValuesFromDropdownMenus()
         observeInvestmentItemsChange()
-//        observeCurrentGoldPriceChange()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
@@ -88,7 +88,6 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-//        mMainViewModel.getCurrentGoldPrice(GOLD_CODE, mSelectedCurrency)
         mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
 
     } // onResume
@@ -103,8 +102,7 @@ class PortfolioFragment : Fragment() {
         mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
 
-        mAutoCompleteTextViewCurrency.onItemClickListener =
-            object : AdapterView.OnItemClickListener {
+        mAutoCompleteTextViewCurrency.onItemClickListener = object : AdapterView.OnItemClickListener {
                 override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                     if (p2 >= 0) {
                         mSelectedCurrency = p0?.getItemAtPosition(p2) as String
@@ -165,13 +163,6 @@ class PortfolioFragment : Fragment() {
 
 
     private fun setTotalCurrentValue() {
-//        val oneOztOfGoldInUSD = 1 / metalPrice.rates.XAU
-//        val oneGramOfGoldInUSD = oneOztOfGoldInUSD / Constants.CONVERT_TROY_OUNCE_CODE
-//        val oneGramOfGoldInEUR = (oneGramOfGoldInUSD) / (1 / metalPrice.rates.EUR)
-
-//        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInUSD.toBigDecimal())
-//        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(oneGramOfGoldInEUR.toBigDecimal())
-
         mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInUSD.toBigDecimal())
         mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInEUR.toBigDecimal())
 
@@ -190,10 +181,18 @@ class PortfolioFragment : Fragment() {
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
                 val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
+                if (totalProfit < BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.RED)
+                else if (totalProfit > BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.GREEN)
                 mTotalProfitValue.text = mLocaleUS.format(totalProfit)
             }
             Constants.CURRENCY_EUR_CODE -> {
                 val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
+                if (totalProfit < BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.RED)
+                else if (totalProfit > BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.GREEN)
                 mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
             }
         }
@@ -251,29 +250,6 @@ class PortfolioFragment : Fragment() {
             }
         }
     } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
-
-
-//    private fun observeCurrentGoldPriceChange() {
-//        mMainViewModel.currentGoldPrice.observe(viewLifecycleOwner) { response ->
-//            when (response) {
-//                is Resource.Success -> {
-//                    response.data?.let { goldPrice ->
-////                        setTotalCurrentValue(goldPrice.price_gram_24k)
-//                        setTotalProfitValue()
-//                    }
-//                }
-//                is Resource.Error -> {
-//                    response.message?.let { message ->
-//                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-//                        toast.show()
-//                        Timber.e(message)
-//                    }
-//                }
-//                is Resource.Loading -> {
-//                }
-//            }
-//        }
-//    } // observeCurrentGoldPriceChange
 
 
     private fun clearDisplayedData() {
