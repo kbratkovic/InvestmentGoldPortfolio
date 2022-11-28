@@ -23,6 +23,7 @@ import com.kbratkovic.investmentgoldportfolio.util.Resource
 import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class AddNewItemFragment : Fragment() {
@@ -169,12 +170,12 @@ class AddNewItemFragment : Fragment() {
             mInvestmentItem.numberOfUnitsPurchased = mEditTextUnitsPurchased.text.toString().toInt()
 
             if (mSelectedWeight == WEIGHT_GRAM_CODE) {
-                mInvestmentItem.weightInGrams = mEditTextWeight.text.toString().toDouble()
+                mInvestmentItem.weightInGrams = mEditTextWeight.text.toString().toDouble().times(unitsPurchased.toDouble())
                 mInvestmentItem.weightInTroyOunce = convertGramsToTroyOunce(mInvestmentItem.weightInGrams)
             }
 
             if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE) {
-                mInvestmentItem.weightInTroyOunce = mEditTextWeight.text.toString().toDouble()
+                mInvestmentItem.weightInTroyOunce = mEditTextWeight.text.toString().toDouble().times(unitsPurchased.toDouble())
                 mInvestmentItem.weightInGrams = convertTroyOunceToGrams(mInvestmentItem.weightInTroyOunce)
             }
 
@@ -204,7 +205,7 @@ class AddNewItemFragment : Fragment() {
 
     private fun convertUSDToEUR(priceInUSD: BigDecimal) : BigDecimal {
         try {
-            return priceInUSD.multiply(mExchangeRateEUR.toBigDecimal())
+            return priceInUSD.multiply(mExchangeRateEUR.toBigDecimal()).setScale(2, RoundingMode.HALF_EVEN)
         }
         catch (e: Exception) {
             Timber.e(e.localizedMessage)
@@ -215,7 +216,7 @@ class AddNewItemFragment : Fragment() {
 
     private fun convertEURToUSD(priceInEUR: BigDecimal) : BigDecimal {
         try {
-            return priceInEUR.multiply(mExchangeRateUSD.toBigDecimal())
+            return priceInEUR.multiply(mExchangeRateUSD.toBigDecimal()).setScale(2, RoundingMode.HALF_EVEN)
         }
         catch (e: Exception) {
             Timber.e(e.localizedMessage)
@@ -225,12 +226,16 @@ class AddNewItemFragment : Fragment() {
 
 
     private fun convertGramsToTroyOunce(weightInGrams: Double) : Double {
-        return weightInGrams / CONVERT_TROY_OUNCE_CODE
+        val double = weightInGrams.div(CONVERT_TROY_OUNCE_CODE)
+        val decimal = BigDecimal(double).setScale(2, RoundingMode.HALF_EVEN)
+        return decimal.toDouble()
     }
 
 
     private fun convertTroyOunceToGrams(weightInTroyOunce: Double) : Double {
-        return weightInTroyOunce * CONVERT_TROY_OUNCE_CODE
+        val double = weightInTroyOunce * CONVERT_TROY_OUNCE_CODE
+        val decimal = BigDecimal(double).setScale(2, RoundingMode.HALF_EVEN)
+        return decimal.toDouble()
     }
 
 
