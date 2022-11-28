@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
@@ -26,36 +27,36 @@ import java.math.BigDecimal
 
 class AddNewItemFragment : Fragment() {
 
-    private lateinit var textViewItemsPurchased: TextView
-    private lateinit var textViewItemPrice: TextView
+    private lateinit var mTextViewItemsPurchased: TextView
+    private lateinit var mTextViewItemPrice: TextView
 
-    private lateinit var editTextItemName: EditText
-    private lateinit var editTextWeight: EditText
-    private lateinit var editTextUnitsPurchased: EditText
-    private lateinit var editTextItemPrice: EditText
+    private lateinit var mEditTextItemName: EditText
+    private lateinit var mEditTextWeight: EditText
+    private lateinit var mEditTextUnitsPurchased: EditText
+    private lateinit var mEditTextItemPrice: EditText
 
-    private lateinit var menuCurrency: TextInputLayout
-    private lateinit var menuMetal: TextInputLayout
-    private lateinit var menuWeight: TextInputLayout
+    private lateinit var mMenuCurrency: TextInputLayout
+    private lateinit var mMenuMetal: TextInputLayout
+    private lateinit var mMenuWeight: TextInputLayout
 
-    private lateinit var layoutWeight: LinearLayout
-    private lateinit var layoutPurchased: LinearLayout
-    private lateinit var layoutPrice: LinearLayout
+    private lateinit var mLayoutWeight: LinearLayout
+    private lateinit var mLayoutPurchased: LinearLayout
+    private lateinit var mLayoutPrice: LinearLayout
 
-    private lateinit var autoCompleteTextViewMetal: AutoCompleteTextView
-    private lateinit var autoCompleteTextViewWeight: AutoCompleteTextView
-    private lateinit var autoCompleteTextViewCurrency: AutoCompleteTextView
+    private lateinit var mAutoCompleteTextViewMetal: AutoCompleteTextView
+    private lateinit var mAutoCompleteTextViewWeight: AutoCompleteTextView
+    private lateinit var mAutoCompleteTextViewCurrency: AutoCompleteTextView
 
-    private lateinit var buttonSave: MaterialButton
+    private lateinit var mButtonSave: MaterialButton
 
-    private var selectedMetal = ""
-    private var selectedWeight = ""
-    private var selectedCurrency = ""
+    private var mSelectedMetal = ""
+    private var mSelectedWeight = ""
+    private var mSelectedCurrency = ""
 
-    private var usdExchangeRate: Double = 0.0
-    private var eurExchangeRate: Double = 0.0
+    private var mExchangeRateUSD = 0.0
+    private var mExchangeRateEUR = 0.0
 
-    private var investmentItem = InvestmentItem()
+    private var mInvestmentItem = InvestmentItem()
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -78,7 +79,7 @@ class AddNewItemFragment : Fragment() {
         handleDropDownMenus()
         handleButtonSave()
         handleEditTextFocusListeners()
-        observeCurrencyRatesChange()
+        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
 
@@ -88,52 +89,50 @@ class AddNewItemFragment : Fragment() {
         handleDropDownMenus()
         handleEditTextFocusListeners()
         getValuesFromDropdownMenus()
-        mMainViewModel.getCurrencyRatesBaseEUR()
     }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("selectedMetal", selectedMetal)
-        outState.putString("selectedWeight", selectedWeight)
-        outState.putString("selectedCurrency", selectedCurrency)
+        outState.putString("selectedMetal", mSelectedMetal)
+        outState.putString("selectedWeight", mSelectedWeight)
+        outState.putString("selectedCurrency", mSelectedCurrency)
     }
 
     private fun getValuesFromDropdownMenus() {
-        selectedMetal = autoCompleteTextViewMetal.text.toString()
-        selectedWeight = autoCompleteTextViewWeight.text.toString()
-        selectedCurrency = autoCompleteTextViewCurrency.text.toString()
+        mSelectedMetal = mAutoCompleteTextViewMetal.text.toString()
+        mSelectedWeight = mAutoCompleteTextViewWeight.text.toString()
+        mSelectedCurrency = mAutoCompleteTextViewCurrency.text.toString()
     }
 
 
     private fun handleEditTextFocusListeners() {
-        editTextItemName.requestFocus()
-        editTextItemName.setOnFocusChangeListener { view, b ->
-            if (!TextUtils.isEmpty(editTextItemName.text.toString()))
-                editTextUnitsPurchased.setText("1")
+        mEditTextItemName.requestFocus()
+        mEditTextItemName.setOnFocusChangeListener { view, b ->
+            if (!TextUtils.isEmpty(mEditTextItemName.text.toString()))
+                mEditTextUnitsPurchased.setText("1")
         }
 
-        editTextWeight.setOnFocusChangeListener { view, b ->
+        mEditTextWeight.setOnFocusChangeListener { view, b ->
             Utils.editTextSelectAll(view as EditText)
         }
 
-        editTextUnitsPurchased.setOnFocusChangeListener { v, hasFocus ->
+        mEditTextUnitsPurchased.setOnFocusChangeListener { v, hasFocus ->
             Utils.editTextSelectAll(v as EditText)
         }
 
-        editTextItemPrice.setOnFocusChangeListener { v, hasFocus ->
+        mEditTextItemPrice.setOnFocusChangeListener { v, hasFocus ->
             Utils.editTextSelectAll(v as EditText)
         }
     }
 
 
-    private fun observeCurrencyRatesChange() {
-        mMainViewModel.currencyRatesBaseEUR.observe(viewLifecycleOwner) { response ->
+    private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
+        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
-                    response.data?.let {
-                        usdExchangeRate = it.rates.USD
-                        mMainViewModel.getCurrencyRatesBaseUSD()
+                    response.data?.let { metalPrice ->
+                        calculateExchangeRates(metalPrice)
                     }
                 }
                 is Resource.Error -> {
@@ -147,67 +146,54 @@ class AddNewItemFragment : Fragment() {
                 }
             }
         }
+    } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
 
-        mMainViewModel.currencyRatesBaseUSD.observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is Resource.Success -> {
-                    response.data?.let {
-                        eurExchangeRate = it.rates.EUR
-                    }
-                }
-                is Resource.Error -> {
-                    response.message?.let { message ->
-                        val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-                        toast.show()
-                        Timber.e(message)
-                    }
-                }
-                is Resource.Loading -> {
-                }
-            }
-        }
-    }
+
+    private fun calculateExchangeRates(metalPrice: MetalPriceApiCom) {
+        mExchangeRateUSD = (1).div(metalPrice.rates.EUR)
+        mExchangeRateEUR = metalPrice.rates.EUR
+    } // calculateExchangeRatesAndGoldPrices
 
 
     private fun handleButtonSave() {
-        buttonSave.setOnClickListener {
+        mButtonSave.setOnClickListener {
             if (!checkIfAllDataIsEntered()) {
                 Toast.makeText(requireContext(), "Not all data is entered!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val unitsPurchased = editTextUnitsPurchased.text.toString().toBigDecimal()
+            val unitsPurchased = mEditTextUnitsPurchased.text.toString().toBigDecimal()
 
-            investmentItem.metal = selectedMetal
-            investmentItem.weightMeasurement = selectedWeight
-            investmentItem.name = editTextItemName.text.toString().trim()
-            investmentItem.numberOfUnitsPurchased = editTextUnitsPurchased.text.toString().toInt()
+            mInvestmentItem.metal = mSelectedMetal
+            mInvestmentItem.weightMeasurement = mSelectedWeight
+            mInvestmentItem.name = mEditTextItemName.text.toString().trim()
+            mInvestmentItem.numberOfUnitsPurchased = mEditTextUnitsPurchased.text.toString().toInt()
 
-            if (selectedWeight == WEIGHT_GRAM_CODE) {
-                investmentItem.weightInGrams = editTextWeight.text.toString().toDouble()
-                investmentItem.weightInTroyOunce = convertGramsToTroyOunce(investmentItem.weightInGrams)
+            if (mSelectedWeight == WEIGHT_GRAM_CODE) {
+                mInvestmentItem.weightInGrams = mEditTextWeight.text.toString().toDouble()
+                mInvestmentItem.weightInTroyOunce = convertGramsToTroyOunce(mInvestmentItem.weightInGrams)
             }
 
-            if (selectedWeight == WEIGHT_TROY_OUNCE_CODE) {
-                investmentItem.weightInTroyOunce = editTextWeight.text.toString().toDouble()
-                investmentItem.weightInGrams = convertTroyOunceToGrams(investmentItem.weightInTroyOunce)
+            if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE) {
+                mInvestmentItem.weightInTroyOunce = mEditTextWeight.text.toString().toDouble()
+                mInvestmentItem.weightInGrams = convertTroyOunceToGrams(mInvestmentItem.weightInTroyOunce)
             }
 
-            when (selectedCurrency) {
+            when (mSelectedCurrency) {
                 CURRENCY_USD_CODE -> {
-                    val priceInUSD = editTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
-                    investmentItem.purchasePriceInUSD = priceInUSD
-                    investmentItem.purchasePriceInEUR = convertUSDToEUR(priceInUSD)
+                    val priceInUSD = mEditTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
+                    mInvestmentItem.purchasePriceInUSD = priceInUSD
+                    mInvestmentItem.purchasePriceInEUR = convertUSDToEUR(priceInUSD)
                 }
                 CURRENCY_EUR_CODE -> {
-                    val priceInEUR = editTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
-                    investmentItem.purchasePriceInEUR = priceInEUR
-                    investmentItem.purchasePriceInUSD = convertEURToUSD(priceInEUR)
+                    val priceInEUR = mEditTextItemPrice.text.toString().toBigDecimal().multiply(unitsPurchased)
+                    mInvestmentItem.purchasePriceInEUR = priceInEUR
+                    mInvestmentItem.purchasePriceInUSD = convertEURToUSD(priceInEUR)
                 }
             }
 
-            saveInvestmentItem(investmentItem)
+            saveInvestmentItem(mInvestmentItem)
         }
-    }
+    } // handleButtonSave
 
 
     private fun saveInvestmentItem(item: InvestmentItem) {
@@ -218,7 +204,7 @@ class AddNewItemFragment : Fragment() {
 
     private fun convertUSDToEUR(priceInUSD: BigDecimal) : BigDecimal {
         try {
-            return priceInUSD.multiply(eurExchangeRate.toBigDecimal())
+            return priceInUSD.multiply(mExchangeRateEUR.toBigDecimal())
         }
         catch (e: Exception) {
             Timber.e(e.localizedMessage)
@@ -229,7 +215,7 @@ class AddNewItemFragment : Fragment() {
 
     private fun convertEURToUSD(priceInEUR: BigDecimal) : BigDecimal {
         try {
-            return priceInEUR.multiply(usdExchangeRate.toBigDecimal())
+            return priceInEUR.multiply(mExchangeRateUSD.toBigDecimal())
         }
         catch (e: Exception) {
             Timber.e(e.localizedMessage)
@@ -249,17 +235,17 @@ class AddNewItemFragment : Fragment() {
 
 
     private fun clearInputFields() {
-        editTextItemName.text.clear()
-        editTextItemName.requestFocus()
-        editTextWeight.setText(getString(R.string.zero_value))
-        editTextUnitsPurchased.setText(getString(R.string.zero_value))
-        editTextItemPrice.setText(getString(R.string.zero_value))
+        mEditTextItemName.text.clear()
+        mEditTextItemName.requestFocus()
+        mEditTextWeight.setText(getString(R.string.zero_value))
+        mEditTextUnitsPurchased.setText(getString(R.string.zero_value))
+        mEditTextItemPrice.setText(getString(R.string.zero_value))
     }
 
 
     private fun checkIfAllDataIsEntered(): Boolean {
-        if (TextUtils.isEmpty(editTextItemName.text.toString()) || TextUtils.isEmpty(editTextWeight.text.toString()) ||
-            TextUtils.isEmpty(editTextUnitsPurchased.text.toString()) || TextUtils.isEmpty(editTextItemPrice.text.toString())) {
+        if (TextUtils.isEmpty(mEditTextItemName.text.toString()) || TextUtils.isEmpty(mEditTextWeight.text.toString()) ||
+            TextUtils.isEmpty(mEditTextUnitsPurchased.text.toString()) || TextUtils.isEmpty(mEditTextItemPrice.text.toString())) {
             return false
         }
         return true
@@ -272,61 +258,62 @@ class AddNewItemFragment : Fragment() {
         val currencyDropdownList = resources.getStringArray(R.array.currency_items)
 
         val arrayAdapterMetal = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, metalDropdownList)
-        autoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
+        mAutoCompleteTextViewMetal.setAdapter(arrayAdapterMetal)
+
+        mAutoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (p2 >= 0) {
+                    mSelectedMetal = p0?.getItemAtPosition(p2) as String
+                    mInvestmentItem.metal = mSelectedMetal
+                }
+            }
+        }
 
         val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
-        autoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
+        mAutoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
+
+        mAutoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                mSelectedWeight = p0?.getItemAtPosition(p2) as String
+                mInvestmentItem.weightMeasurement = mSelectedWeight
+            }
+        }
 
         val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
-        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
+        mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        autoCompleteTextViewMetal.onItemClickListener = object: AdapterView.OnItemClickListener {
+        mAutoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
-                    selectedMetal = p0?.getItemAtPosition(p2) as String
-                    investmentItem.metal = selectedMetal
+                    mSelectedCurrency = p0?.getItemAtPosition(p2) as String
                 }
             }
         }
-
-        autoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                selectedWeight = p0?.getItemAtPosition(p2) as String
-                investmentItem.weightMeasurement = selectedWeight
-            }
-        }
-
-        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                if (p2 >= 0) {
-                    selectedCurrency = p0?.getItemAtPosition(p2) as String
-                }
-            }
-        }
-    }
+    } // handleDropDownMenus
 
 
     private fun initializeLayoutViews(view: View) {
-        textViewItemsPurchased = view.findViewById(R.id.text_view_items_purchased)
-        textViewItemPrice = view.findViewById(R.id.text_view_item_price)
+        mTextViewItemsPurchased = view.findViewById(R.id.text_view_items_purchased)
+        mTextViewItemPrice = view.findViewById(R.id.text_view_item_price)
 
-        editTextItemName = view.findViewById(R.id.edit_text_item_name)
-        editTextWeight = view.findViewById(R.id.edit_text_weight)
-        editTextUnitsPurchased = view.findViewById(R.id.edit_text_units_purchased)
-        editTextItemPrice = view.findViewById(R.id.edit_text_item_price)
+        mEditTextItemName = view.findViewById(R.id.edit_text_item_name)
+        mEditTextWeight = view.findViewById(R.id.edit_text_weight)
+        mEditTextUnitsPurchased = view.findViewById(R.id.edit_text_units_purchased)
+        mEditTextItemPrice = view.findViewById(R.id.edit_text_item_price)
 
-        menuCurrency = view.findViewById(R.id.menu_currency)
-        menuMetal = view.findViewById(R.id.menu_metal)
-        menuWeight = view.findViewById(R.id.menu_weight)
+        mMenuCurrency = view.findViewById(R.id.menu_currency)
+        mMenuMetal = view.findViewById(R.id.menu_metal)
+        mMenuWeight = view.findViewById(R.id.menu_weight)
 
-        layoutWeight = view.findViewById(R.id.layout_weight)
-        layoutPurchased = view.findViewById(R.id.layout_purchased)
-        layoutPrice = view.findViewById(R.id.layout_price)
+        mLayoutWeight = view.findViewById(R.id.layout_weight)
+        mLayoutPurchased = view.findViewById(R.id.layout_purchased)
+        mLayoutPrice = view.findViewById(R.id.layout_price)
 
-        autoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
-        autoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
-        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
+        mAutoCompleteTextViewMetal = view.findViewById(R.id.auto_complete_text_view_metal)
+        mAutoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
+        mAutoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
 
-        buttonSave = view.findViewById(R.id.button_save)
-    }
+        mButtonSave = view.findViewById(R.id.button_save)
+    } // initializeLayoutViews
+
 }
