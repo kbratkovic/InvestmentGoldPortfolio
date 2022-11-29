@@ -78,7 +78,8 @@ class MainViewModel(
         _currentGoldPriceFromMetalPriceApiCom.postValue(Resource.Loading())
 
         try {
-            val response = repository.getCurrentGoldPriceFromMetalPriceApiCom(Constants.METAL_PRICE_API_COM_KEY, Constants.CURRENCY_USD_CODE, "${Constants.CURRENCY_EUR_CODE},${Constants.GOLD_CODE}")
+            val response = repository.getCurrentGoldPriceFromMetalPriceApiCom(Constants.METAL_PRICE_API_COM_KEY, Constants.CURRENCY_USD_CODE,
+                "${Constants.CURRENCY_EUR_CODE},${Constants.GOLD_CODE},${Constants.SILVER_CODE},${Constants.PLATINUM_CODE},${Constants.PALLADIUM_CODE}")
             _currentGoldPriceFromMetalPriceApiCom.postValue(handleCurrentGoldPriceFromMetalPriceApiCo(response))
         } catch (e: SocketTimeoutException) {
             Timber.e(e.localizedMessage)

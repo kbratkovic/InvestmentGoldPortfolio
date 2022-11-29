@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.ApiPricesFragment">
+    tools:context=".ui.fragments.MarketPricesFragment">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/linear_progress_indicator"
@@ -104,7 +104,7 @@
                 android:textSize="60sp" />
 
             <TextView
-                android:id="@+id/metal_current_price"
+                android:id="@+id/gold_current_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="4dp"

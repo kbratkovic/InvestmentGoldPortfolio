@@ -28,19 +28,22 @@ import java.text.NumberFormat
 import java.util.*
 
 
-class ApiPricesFragment : Fragment() {
+class MarketPricesFragment : Fragment() {
 
-    private lateinit var textViewTimeAndDate: TextView
-    private lateinit var textViewMetalCurrentPrice: TextView
+    private lateinit var mTextViewTimeAndDate: TextView
+    private lateinit var mTextViewGoldCurrentPrice: TextView
+    private lateinit var mTextViewSilverCurrentPrice: TextView
+    private lateinit var mTextViewPlatinumCurrentPrice: TextView
+    private lateinit var mTextViewPalladiumCurrentPrice: TextView
 
-    private lateinit var autoCompleteTextViewWeight : AutoCompleteTextView
-    private lateinit var autoCompleteTextViewCurrency : AutoCompleteTextView
+    private lateinit var mAutoCompleteTextViewWeight : AutoCompleteTextView
+    private lateinit var mAutoCompleteTextViewCurrency : AutoCompleteTextView
 
-    private lateinit var pricesContainer: ConstraintLayout
+    private lateinit var mPricesContainer: ConstraintLayout
 
-    private lateinit var selectedMetal: String
-    private lateinit var selectedWeight: String
-    private lateinit var selectedCurrency: String
+    private lateinit var mSelectedMetal: String
+    private lateinit var mSelectedWeight: String
+    private lateinit var mSelectedCurrency: String
 
     private var mLocaleUS =  NumberFormat.getCurrencyInstance(Locale.US)
     private var mLocaleEUR =  NumberFormat.getCurrencyInstance(Locale.GERMANY)
@@ -49,6 +52,22 @@ class ApiPricesFragment : Fragment() {
     private var mPriceOfOneOztOfGoldInEUR = 0.0
     private var mPriceOfOneGramOfGoldInUSD = 0.0
     private var mPriceOfOneGramOfGoldInEUR = 0.0
+
+    private var mPriceOfOneOztOfSilverInUSD = 0.0
+    private var mPriceOfOneOztOfSilverInEUR = 0.0
+    private var mPriceOfOneGramOfSilverInUSD = 0.0
+    private var mPriceOfOneGramOfSilverInEUR = 0.0
+
+    private var mPriceOfOneOztOfPlatinumInUSD = 0.0
+    private var mPriceOfOneOztOfPlatinumInEUR = 0.0
+    private var mPriceOfOneGramOfPlatinumInUSD = 0.0
+    private var mPriceOfOneGramOfPlatinumInEUR = 0.0
+
+    private var mPriceOfOneOztOfPalladiumInUSD = 0.0
+    private var mPriceOfOneOztOfPalladiumInEUR = 0.0
+    private var mPriceOfOneGramOfPalladiumInUSD = 0.0
+    private var mPriceOfOneGramOfPalladiumInEUR = 0.0
+
     private var mExchangeRateUSD = 0.0
     private var mExchangeRateEUR = 0.0
 
@@ -94,13 +113,17 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun initializeLayoutViews(view: View) {
-        textViewTimeAndDate = view.findViewById(R.id.time_and_date)
+        mTextViewTimeAndDate = view.findViewById(R.id.time_and_date)
 
-        autoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
-        autoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
+        mAutoCompleteTextViewWeight = view.findViewById(R.id.auto_complete_text_view_weight)
+        mAutoCompleteTextViewCurrency = view.findViewById(R.id.auto_complete_text_view_currency)
 
-        pricesContainer = view.findViewById(R.id.prices_container)
-        textViewMetalCurrentPrice = view.findViewById(R.id.metal_current_price)
+        mPricesContainer = view.findViewById(R.id.prices_container)
+
+        mTextViewGoldCurrentPrice = view.findViewById(R.id.gold_current_price)
+        mTextViewSilverCurrentPrice = view.findViewById(R.id.silver_current_price)
+        mTextViewPlatinumCurrentPrice = view.findViewById(R.id.platinum_current_price)
+        mTextViewPalladiumCurrentPrice = view.findViewById(R.id.palladium_current_price)
 
     }
 
@@ -125,19 +148,19 @@ class ApiPricesFragment : Fragment() {
                         displayDateAndTime(metalPrice)
                         calculateExchangeRatesAndGoldPrices(metalPrice)
 
-                        when (selectedCurrency) {
+                        when (mSelectedCurrency) {
                             CURRENCY_USD_CODE -> {
-                                textViewMetalCurrentPrice.text = mLocaleUS.format(0)
-                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
+                                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                     displayPricesInUSDAndTroyOunce()
-                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                if (mSelectedWeight == WEIGHT_GRAM_CODE)
                                     displayPricesInUSDAndGrams()
                             }
                             CURRENCY_EUR_CODE -> {
-                                textViewMetalCurrentPrice.text = mLocaleEUR.format(0)
-                                if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                                mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
+                                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                     displayPricesInEURAndTroyOunce()
-                                if (selectedWeight == WEIGHT_GRAM_CODE)
+                                if (mSelectedWeight == WEIGHT_GRAM_CODE)
                                     displayPricesInEURAndGrams()
                             }
                         }
@@ -165,10 +188,25 @@ class ApiPricesFragment : Fragment() {
         mPriceOfOneOztOfGoldInEUR = (1).div(metalPrice.rates.XAU).times(mExchangeRateEUR)
         mPriceOfOneGramOfGoldInUSD = mPriceOfOneOztOfGoldInUSD.div(CONVERT_TROY_OUNCE_CODE)
         mPriceOfOneGramOfGoldInEUR = mPriceOfOneOztOfGoldInEUR.div(CONVERT_TROY_OUNCE_CODE)
+
+        mPriceOfOneOztOfSilverInUSD = (1).div(metalPrice.rates.XAG)
+        mPriceOfOneOztOfSilverInEUR = (1).div(metalPrice.rates.XAG).times(mExchangeRateEUR)
+        mPriceOfOneGramOfSilverInUSD = mPriceOfOneOztOfSilverInUSD.div(CONVERT_TROY_OUNCE_CODE)
+        mPriceOfOneGramOfSilverInEUR = mPriceOfOneOztOfSilverInEUR.div(CONVERT_TROY_OUNCE_CODE)
+
+        mPriceOfOneOztOfPlatinumInUSD = (1).div(metalPrice.rates.XPT)
+        mPriceOfOneOztOfPlatinumInEUR = (1).div(metalPrice.rates.XPT).times(mExchangeRateEUR)
+        mPriceOfOneGramOfPlatinumInUSD = mPriceOfOneOztOfPlatinumInUSD.div(CONVERT_TROY_OUNCE_CODE)
+        mPriceOfOneGramOfPlatinumInEUR = mPriceOfOneOztOfPlatinumInEUR.div(CONVERT_TROY_OUNCE_CODE)
+
+        mPriceOfOneOztOfPalladiumInUSD = (1).div(metalPrice.rates.XPD)
+        mPriceOfOneOztOfPalladiumInEUR = (1).div(metalPrice.rates.XPD).times(mExchangeRateEUR)
+        mPriceOfOneGramOfPalladiumInUSD = mPriceOfOneOztOfPalladiumInUSD.div(CONVERT_TROY_OUNCE_CODE)
+        mPriceOfOneGramOfPalladiumInEUR = mPriceOfOneOztOfPalladiumInEUR.div(CONVERT_TROY_OUNCE_CODE)
     }
 
     private fun displayDateAndTime(metalPrice: MetalPriceApiCom) {
-        textViewTimeAndDate.text =
+        mTextViewTimeAndDate.text =
             getString(R.string.time_and_date, formatDateAndTime(metalPrice))
     }
 
@@ -188,24 +226,24 @@ class ApiPricesFragment : Fragment() {
         val weightDropdownList = resources.getStringArray(R.array.weight_items)
 
         val arrayAdapterWeight = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, weightDropdownList)
-        autoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
+        mAutoCompleteTextViewWeight.setAdapter(arrayAdapterWeight)
 
-        autoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
+        mAutoCompleteTextViewWeight.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
-                    selectedWeight = p0?.getItemAtPosition(p2) as String
+                    mSelectedWeight = p0?.getItemAtPosition(p2) as String
 
-                    when (selectedWeight) {
+                    when (mSelectedWeight) {
                         WEIGHT_GRAM_CODE -> {
-                            if (selectedCurrency == CURRENCY_EUR_CODE)
+                            if (mSelectedCurrency == CURRENCY_EUR_CODE)
                                 displayPricesInEURAndGrams()
-                            if (selectedCurrency == CURRENCY_USD_CODE)
+                            if (mSelectedCurrency == CURRENCY_USD_CODE)
                                 displayPricesInUSDAndGrams()
                         }
                         WEIGHT_TROY_OUNCE_CODE -> {
-                            if (selectedCurrency == CURRENCY_EUR_CODE)
+                            if (mSelectedCurrency == CURRENCY_EUR_CODE)
                                 displayPricesInEURAndTroyOunce()
-                            if (selectedCurrency == CURRENCY_USD_CODE)
+                            if (mSelectedCurrency == CURRENCY_USD_CODE)
                                 displayPricesInUSDAndTroyOunce()
                         }
                     }
@@ -215,24 +253,24 @@ class ApiPricesFragment : Fragment() {
 
 
         val arrayAdapterCurrency = ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
-        autoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
+        mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
 
-        autoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
+        mAutoCompleteTextViewCurrency.onItemClickListener = object: AdapterView.OnItemClickListener {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
-                    selectedCurrency = p0?.getItemAtPosition(p2) as String
+                    mSelectedCurrency = p0?.getItemAtPosition(p2) as String
 
-                    when (selectedCurrency) {
+                    when (mSelectedCurrency) {
                         CURRENCY_EUR_CODE -> {
-                            if (selectedWeight == WEIGHT_GRAM_CODE)
+                            if (mSelectedWeight == WEIGHT_GRAM_CODE)
                                 displayPricesInEURAndGrams()
-                            if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                            if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                 displayPricesInEURAndTroyOunce()
                         }
                         CURRENCY_USD_CODE -> {
-                            if (selectedWeight == WEIGHT_GRAM_CODE)
+                            if (mSelectedWeight == WEIGHT_GRAM_CODE)
                                 displayPricesInUSDAndGrams()
-                            if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                            if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                 displayPricesInUSDAndTroyOunce()
                         }
                     }
@@ -243,46 +281,58 @@ class ApiPricesFragment : Fragment() {
 
 
     private fun displayPricesInUSDAndTroyOunce() {
-        textViewMetalCurrentPrice.text = mLocaleUS.format(mPriceOfOneOztOfGoldInUSD)
+        mTextViewGoldCurrentPrice.text = mLocaleUS.format(mPriceOfOneOztOfGoldInUSD)
+        mTextViewSilverCurrentPrice.text = mLocaleUS.format(mPriceOfOneOztOfSilverInUSD)
+        mTextViewPlatinumCurrentPrice.text = mLocaleUS.format(mPriceOfOneOztOfPlatinumInUSD)
+        mTextViewPalladiumCurrentPrice.text = mLocaleUS.format(mPriceOfOneOztOfPalladiumInUSD)
     }
 
 
     private fun displayPricesInEURAndTroyOunce() {
-        textViewMetalCurrentPrice.text = mLocaleEUR.format(mPriceOfOneOztOfGoldInEUR)
+        mTextViewGoldCurrentPrice.text = mLocaleEUR.format(mPriceOfOneOztOfGoldInEUR)
+        mTextViewSilverCurrentPrice.text = mLocaleEUR.format(mPriceOfOneOztOfSilverInEUR)
+        mTextViewPlatinumCurrentPrice.text = mLocaleEUR.format(mPriceOfOneOztOfPlatinumInEUR)
+        mTextViewPalladiumCurrentPrice.text = mLocaleEUR.format(mPriceOfOneOztOfPalladiumInEUR)
     }
 
 
     private fun displayPricesInUSDAndGrams() {
-        textViewMetalCurrentPrice.text = mLocaleUS.format(mPriceOfOneGramOfGoldInUSD)
+        mTextViewGoldCurrentPrice.text = mLocaleUS.format(mPriceOfOneGramOfGoldInUSD)
+        mTextViewSilverCurrentPrice.text = mLocaleUS.format(mPriceOfOneGramOfSilverInUSD)
+        mTextViewPlatinumCurrentPrice.text = mLocaleUS.format(mPriceOfOneGramOfPlatinumInUSD)
+        mTextViewPalladiumCurrentPrice.text = mLocaleUS.format(mPriceOfOneGramOfPalladiumInUSD)
     }
 
 
     private fun displayPricesInEURAndGrams() {
-        textViewMetalCurrentPrice.text = mLocaleEUR.format(mPriceOfOneGramOfGoldInEUR)
+        mTextViewGoldCurrentPrice.text = mLocaleEUR.format(mPriceOfOneGramOfGoldInEUR)
+        mTextViewSilverCurrentPrice.text = mLocaleEUR.format(mPriceOfOneGramOfSilverInEUR)
+        mTextViewPlatinumCurrentPrice.text = mLocaleEUR.format(mPriceOfOneGramOfPlatinumInEUR)
+        mTextViewPalladiumCurrentPrice.text = mLocaleEUR.format(mPriceOfOneGramOfPalladiumInEUR)
     }
 
 
     private fun showPricesContainer() {
-        pricesContainer.visibility = View.VISIBLE
+        mPricesContainer.visibility = View.VISIBLE
     }
 
 
     private fun setDefaultValueInDropDownMenu() {
-        selectedMetal = GOLD_CODE
-        selectedWeight = WEIGHT_TROY_OUNCE_CODE
-        selectedCurrency = CURRENCY_USD_CODE
-        autoCompleteTextViewCurrency.setText(CURRENCY_USD_CODE, false)
-        autoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
+        mSelectedMetal = GOLD_CODE
+        mSelectedWeight = WEIGHT_TROY_OUNCE_CODE
+        mSelectedCurrency = CURRENCY_USD_CODE
+        mAutoCompleteTextViewCurrency.setText(CURRENCY_USD_CODE, false)
+        mAutoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
     }
 
 
     private fun displayDefaultZeroValues() {
-        when (selectedCurrency) {
+        when (mSelectedCurrency) {
             CURRENCY_USD_CODE -> {
-                textViewMetalCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
             }
             CURRENCY_EUR_CODE -> {
-                textViewMetalCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
             }
         }
     }

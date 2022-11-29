@@ -13,6 +13,9 @@ class Constants {
         const val METAL_PRICE_API_COM_URL = "https://api.metalpriceapi.com/v1/"
 
         const val GOLD_CODE = "XAU"
+        const val SILVER_CODE = "XAG"
+        const val PLATINUM_CODE = "XPT"
+        const val PALLADIUM_CODE = "XPD"
         const val CURRENCY_USD_CODE = "USD"
         const val CURRENCY_EUR_CODE = "EUR"
         const val WEIGHT_GRAM_CODE = "gram"

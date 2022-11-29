@@ -17,7 +17,7 @@
         tools:layout="@layout/fragment_portfolio"/>
     <fragment
         android:id="@+id/prices"
-        android:name="com.kbratkovic.investmentgoldportfolio.ui.fragments.ApiPricesFragment"
+        android:name="com.kbratkovic.investmentgoldportfolio.ui.fragments.MarketPricesFragment"
         android:label="fragment_api_prices"
         tools:layout="@layout/fragment_api_prices" />
 </navigation>

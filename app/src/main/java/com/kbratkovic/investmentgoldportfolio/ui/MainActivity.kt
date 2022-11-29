@@ -7,7 +7,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -17,7 +16,6 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
@@ -41,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val mSettingsFragment = SettingsFragment()
     private val mGalleryFragment = GalleryFragment()
     private val mAddNewItemFragment = AddNewItemFragment()
-    private val mApiPricesFragment = ApiPricesFragment()
+    private val mMarketPricesFragment = MarketPricesFragment()
 
     private lateinit var mMainViewModel: MainViewModel
 
@@ -82,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                 setToolbarTitle(mAddNewItemFragment)
             }
             if(destination.id == R.id.prices) {
-                setToolbarTitle(mApiPricesFragment)
+                setToolbarTitle(mMarketPricesFragment)
             }
         }
     }
@@ -179,7 +177,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.prices -> {
-                    setToolbarTitle(mApiPricesFragment)
+                    setToolbarTitle(mMarketPricesFragment)
 
 //                    supportFragmentManager.beginTransaction().apply {
 //                        replace(R.id.fragment_container, mApiPricesFragment)
@@ -212,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             mSettingsFragment -> mToolbar.title = getString(R.string.menu_settings)
             mAddNewItemFragment -> mToolbar.title = getString(R.string.menu_add_new_item)
             mGalleryFragment -> mToolbar.title = getString(R.string.menu_gallery)
-            mApiPricesFragment -> mToolbar.title = getString(R.string.menu_api_prices)
+            mMarketPricesFragment -> mToolbar.title = getString(R.string.menu_api_prices)
             else -> mToolbar.title = getString(R.string.app_name)
         }
     }

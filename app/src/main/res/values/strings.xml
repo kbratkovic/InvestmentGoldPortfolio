@@ -30,6 +30,8 @@
 
     <string name="metal_gold">Gold</string>
     <string name="metal_silver">Silver</string>
+    <string name="metal_platinum">Platinum</string>
+    <string name="metal_palladium">Palladium</string>
 
     <string name="currency_usd">USD</string>
     <string name="currency_eur">EUR</string>

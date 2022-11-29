@@ -15,4 +15,12 @@
         <item name="android:layout_marginBottom">5sp</item>
         <item name="android:textSize">20sp</item>
     </style>
+
+    <style name="metal_price_style">
+        <item name="android:text">@string/price_holder</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+
 </resources>
