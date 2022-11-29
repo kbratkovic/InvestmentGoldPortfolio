@@ -9,16 +9,20 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
+import com.kbratkovic.investmentgoldportfolio.util.Constants
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.NetworkConnection
 import com.kbratkovic.investmentgoldportfolio.util.Resource
+import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
 import java.text.DateFormat
 import java.text.NumberFormat
@@ -70,6 +74,7 @@ class ApiPricesFragment : Fragment() {
         initializeLayoutViews(view)
 //        startOnDataChangeListener()
         setDefaultValueInDropDownMenu()
+        displayDefaultZeroValues()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
     } // onViewCreated
 
@@ -78,6 +83,14 @@ class ApiPricesFragment : Fragment() {
         super.onResume()
         handleDropDownMenus()
         setDefaultValueInDropDownMenu()
+
+        if (!NetworkConnection.hasInternetConnection(requireContext())) {
+            val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+            if (bottomNavigationView != null) {
+                Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.error_network_connection), bottomNavigationView)
+            }
+        }
     }
 
 
@@ -115,14 +128,14 @@ class ApiPricesFragment : Fragment() {
 
                         when (selectedCurrency) {
                             CURRENCY_USD_CODE -> {
-                                textViewMetalCurrentPrice.text = mLocaleUS.format(getString(R.string.price_holder).toInt())
+                                textViewMetalCurrentPrice.text = mLocaleUS.format(0)
                                 if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                     displayPricesInUSDAndTroyOunce()
                                 if (selectedWeight == WEIGHT_GRAM_CODE)
                                     displayPricesInUSDAndGrams()
                             }
                             CURRENCY_EUR_CODE -> {
-                                textViewMetalCurrentPrice.text = mLocaleEUR.format(getString(R.string.price_holder).toInt())
+                                textViewMetalCurrentPrice.text = mLocaleEUR.format(0)
                                 if (selectedWeight == WEIGHT_TROY_OUNCE_CODE)
                                     displayPricesInEURAndTroyOunce()
                                 if (selectedWeight == WEIGHT_GRAM_CODE)
@@ -194,7 +207,7 @@ class ApiPricesFragment : Fragment() {
                             if (selectedCurrency == CURRENCY_EUR_CODE)
                                 displayPricesInEURAndTroyOunce()
                             if (selectedCurrency == CURRENCY_USD_CODE)
-                                displayPricesInEURAndGrams()
+                                displayPricesInUSDAndTroyOunce()
                         }
                     }
                 }
@@ -263,5 +276,16 @@ class ApiPricesFragment : Fragment() {
         autoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
     }
 
+
+    private fun displayDefaultZeroValues() {
+        when (selectedCurrency) {
+            Constants.CURRENCY_USD_CODE -> {
+                textViewMetalCurrentPrice.text = mLocaleUS.format(0)
+            }
+            Constants.CURRENCY_EUR_CODE -> {
+                textViewMetalCurrentPrice.text = mLocaleEUR.format(0)
+            }
+        }
+    }
 
 }

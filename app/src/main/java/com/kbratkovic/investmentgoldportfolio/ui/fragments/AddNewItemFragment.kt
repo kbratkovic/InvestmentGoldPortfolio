@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
@@ -19,6 +20,7 @@ import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.NetworkConnection
 import com.kbratkovic.investmentgoldportfolio.util.Resource
 import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
@@ -159,7 +161,7 @@ class AddNewItemFragment : Fragment() {
     private fun handleButtonSave() {
         mButtonSave.setOnClickListener {
             if (!checkIfAllDataIsEntered()) {
-                Toast.makeText(requireContext(), "Not all data is entered!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.error_not_all_data_entered), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val unitsPurchased = mEditTextUnitsPurchased.text.toString().toBigDecimal()
@@ -192,7 +194,15 @@ class AddNewItemFragment : Fragment() {
                 }
             }
 
-            saveInvestmentItem(mInvestmentItem)
+            if (!NetworkConnection.hasInternetConnection(requireContext())) {
+                val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+                if (bottomNavigationView != null) {
+                    Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+                        getString(R.string.error_network_connection), bottomNavigationView)
+                }
+            } else {
+                saveInvestmentItem(mInvestmentItem)
+            }
         }
     } // handleButtonSave
 

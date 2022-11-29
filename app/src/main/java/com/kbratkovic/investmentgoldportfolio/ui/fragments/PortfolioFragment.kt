@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
@@ -17,7 +18,9 @@ import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 import com.kbratkovic.investmentgoldportfolio.util.Constants
+import com.kbratkovic.investmentgoldportfolio.util.NetworkConnection
 import com.kbratkovic.investmentgoldportfolio.util.Resource
+import com.kbratkovic.investmentgoldportfolio.util.Utils
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -86,7 +89,7 @@ class PortfolioFragment : Fragment() {
         getValuesFromDropdownMenus()
         handleRecyclerView()
         observeInvestmentItemsChange()
-//        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
+        observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
     } // end onViewCreated
 
@@ -94,9 +97,37 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-//        mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
+        displayDefaultZeroValues()
+
+
+        if (NetworkConnection.hasInternetConnection(requireContext())) {
+            mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
+        }
+        else {
+            hideLinearProgressIndicator()
+            val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+            if (bottomNavigationView != null) {
+                // android.R.id.content gives you the root element of a view, without having to know its actual name/type/ID.
+                Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.error_network_connection), bottomNavigationView)
+            }
+        }
 
     } // onResume
+
+
+    private fun displayDefaultZeroValues() {
+        when (mSelectedCurrency) {
+            Constants.CURRENCY_USD_CODE -> {
+                mCurrentMarketValue.text = mLocaleUS.format(0)
+                mTotalProfitValue.text = mLocaleUS.format(0)
+            }
+            Constants.CURRENCY_EUR_CODE -> {
+                mCurrentMarketValue.text = mLocaleEUR.format(0)
+                mTotalProfitValue.text = mLocaleEUR.format(0)
+            }
+        }
+    }
 
 
     private fun startOnDataChangeListener() {
@@ -126,7 +157,7 @@ class PortfolioFragment : Fragment() {
                         mSelectedCurrency = p0?.getItemAtPosition(p2) as String
 
                         setTotalPurchasePrice()
-                        setTotalCurrentValue()
+                        setCurrentMarketValue()
                         setTotalProfitValue()
                         mPortfolioAdapter.sendDataToAdapter(mDataSet, mSelectedCurrency, mSelectedWeight)
                     }
@@ -182,7 +213,7 @@ class PortfolioFragment : Fragment() {
     }
 
 
-    private fun setTotalCurrentValue() {
+    private fun setCurrentMarketValue() {
         mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInUSD.toBigDecimal())
         mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInEUR.toBigDecimal())
 
@@ -198,6 +229,7 @@ class PortfolioFragment : Fragment() {
 
 
     private fun setTotalProfitValue() {
+        displayDefaultZeroValues()
         if (mApiResponse) {
             when (mSelectedCurrency) {
                 Constants.CURRENCY_USD_CODE -> {
@@ -234,11 +266,12 @@ class PortfolioFragment : Fragment() {
 
     private fun observeInvestmentItemsChange() {
         mMainViewModel.allInvestmentItems.observe(viewLifecycleOwner) { listOfInvestmentItems ->
+            clearDisplayedData()
+            mDataSet.clear()
             mDataSet.addAll(listOfInvestmentItems)
             mPortfolioAdapter.sendDataToAdapter(mDataSet, mSelectedCurrency, mSelectedWeight)
 
             for (item in mDataSet) {
-//                clearDisplayedData()
                 mTotalPurchasePriceInEUR = mTotalPurchasePriceInEUR.add(item.purchasePriceInEUR)
                 mTotalPurchasePriceInUSD = mTotalPurchasePriceInUSD.add(item.purchasePriceInUSD)
                 mTotalWeightInGrams = mTotalWeightInGrams.plus(item.weightInGrams)
@@ -259,7 +292,7 @@ class PortfolioFragment : Fragment() {
                     response.data?.let { metalPrice ->
                         mApiResponse = true
                         calculateExchangeRatesAndGoldPrices(metalPrice)
-                        setTotalCurrentValue()
+                        setCurrentMarketValue()
                         setTotalProfitValue()
                     }
                 }

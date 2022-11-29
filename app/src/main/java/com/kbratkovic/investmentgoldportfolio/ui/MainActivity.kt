@@ -3,11 +3,11 @@ package com.kbratkovic.investmentgoldportfolio.ui
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -17,6 +17,7 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
@@ -57,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 //        bottomNavigationItemSelectedListener()
         handleDarkModeSwitch()
         setBottomNavigation()
+
     } // onCreate End
 
 
@@ -98,7 +100,6 @@ class MainActivity : AppCompatActivity() {
         mDrawerLayout = findViewById(R.id.drawer_layout)
         mNavigationView = findViewById(R.id.drawer_navigation_view)
         mBottomNavigation = findViewById(R.id.bottom_navigation)
-//        fab = findViewById(R.id.fab)
 
         val menuItem = mNavigationView.menu.findItem(R.id.switch_theme)
         materialSwitch = menuItem.actionView?.findViewById(R.id.switch_dark_theme)

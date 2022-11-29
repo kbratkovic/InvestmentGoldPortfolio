@@ -52,8 +52,8 @@
     <string name="total_weight_holder">Weight purchased: %1$s %2$s</string>
     <string name="total_units_purchased_holder">Units purchased: %1$s</string>
     <string name="total_purchase_price_holder">Total price: %1$s</string>
-
-
+    <string name="error_network_connection">No Internet Connection</string>
+    <string name="error_not_all_data_entered">Please enter required data.</string>
 
 
 </resources>
