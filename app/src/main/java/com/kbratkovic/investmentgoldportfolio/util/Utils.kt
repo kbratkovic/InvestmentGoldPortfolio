@@ -3,6 +3,8 @@ package com.kbratkovic.investmentgoldportfolio.util
 import android.view.View
 import android.widget.EditText
 import com.google.android.material.snackbar.Snackbar
+import java.text.DateFormat
+import java.util.*
 
 object  Utils {
 
@@ -20,4 +22,10 @@ object  Utils {
             .setAnchorView(anchorView)
             .show()
     }
+
+
+    fun convertEpochTimeToDate(currentTimeMillis: Long, locale: Locale): String? {
+        return DateFormat.getDateInstance(DateFormat.SHORT, locale).format(currentTimeMillis)
+    }
+
 }

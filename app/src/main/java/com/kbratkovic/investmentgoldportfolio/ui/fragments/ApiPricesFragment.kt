@@ -13,7 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
-import com.kbratkovic.investmentgoldportfolio.util.Constants
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
@@ -174,8 +173,8 @@ class ApiPricesFragment : Fragment() {
     }
 
 
-    private fun formatDateAndTime(goldPriceResponse: MetalPriceApiCom) : String {
-        val date = Date(goldPriceResponse.timestamp.toLong() * 1000)
+    private fun formatDateAndTime(metalPrice: MetalPriceApiCom) : String {
+        val date = Date(metalPrice.timestamp.toLong() * 1000)
         val dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.US)
         val formattedDate = dateFormat.format(date)
@@ -279,10 +278,10 @@ class ApiPricesFragment : Fragment() {
 
     private fun displayDefaultZeroValues() {
         when (selectedCurrency) {
-            Constants.CURRENCY_USD_CODE -> {
+            CURRENCY_USD_CODE -> {
                 textViewMetalCurrentPrice.text = mLocaleUS.format(0)
             }
-            Constants.CURRENCY_EUR_CODE -> {
+            CURRENCY_EUR_CODE -> {
                 textViewMetalCurrentPrice.text = mLocaleEUR.format(0)
             }
         }

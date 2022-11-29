@@ -92,6 +92,18 @@ class AddNewItemFragment : Fragment() {
         handleDropDownMenus()
         handleEditTextFocusListeners()
         getValuesFromDropdownMenus()
+
+        if (!NetworkConnection.hasInternetConnection(requireContext())) {
+            mButtonSave.visibility = View.GONE
+            val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+            if (bottomNavigationView != null) {
+                Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+                    getString(R.string.error_network_connection), bottomNavigationView)
+            }
+        }
+        else {
+            mButtonSave.visibility = View.VISIBLE
+        }
     }
 
 
@@ -170,6 +182,7 @@ class AddNewItemFragment : Fragment() {
             mInvestmentItem.weightMeasurement = mSelectedWeight
             mInvestmentItem.name = mEditTextItemName.text.toString().trim()
             mInvestmentItem.numberOfUnitsPurchased = mEditTextUnitsPurchased.text.toString().toInt()
+            mInvestmentItem.epochtime = System.currentTimeMillis()
 
             if (mSelectedWeight == WEIGHT_GRAM_CODE) {
                 mInvestmentItem.weightInGrams = mEditTextWeight.text.toString().toDouble().times(unitsPurchased.toDouble())

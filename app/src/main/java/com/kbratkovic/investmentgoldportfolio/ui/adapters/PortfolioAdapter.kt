@@ -1,12 +1,10 @@
 package com.kbratkovic.investmentgoldportfolio.ui.adapters
 
 import android.content.Context
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.res.TypedArrayUtils.getString
 import androidx.recyclerview.widget.RecyclerView
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
@@ -15,6 +13,7 @@ import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_TROY_OUNCE_CODE
+import com.kbratkovic.investmentgoldportfolio.util.Utils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -56,15 +55,18 @@ class PortfolioAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemName.text = dataSet[position].name
-        holder.itemMetal.text = dataSet[position].metal
         holder.itemUnitsPurchased.text = context.getString(R.string.total_units_purchased_holder, dataSet[position].numberOfUnitsPurchased.toString())
 
         when (selectedCurrency) {
             CURRENCY_USD_CODE -> {
-                holder.itemPurchasePrice.text = context.getString(R.string.total_purchase_price_holder, mLocaleUS.format(dataSet[position].purchasePriceInUSD?.setScale(2, RoundingMode.HALF_EVEN)))
+                holder.itemPurchasePrice.text = context.getString(R.string.total_purchase_price_holder,
+                    mLocaleUS.format(dataSet[position].purchasePriceInUSD?.setScale(2, RoundingMode.HALF_EVEN)))
+                holder.itemMetal.text = Utils.convertEpochTimeToDate(dataSet[position].epochtime, Locale.US)
             }
             CURRENCY_EUR_CODE -> {
-                holder.itemPurchasePrice.text = context.getString(R.string.total_purchase_price_holder, mLocaleEUR.format(dataSet[position].purchasePriceInEUR.setScale(2, RoundingMode.HALF_EVEN)))
+                holder.itemPurchasePrice.text = context.getString(R.string.total_purchase_price_holder,
+                    mLocaleEUR.format(dataSet[position].purchasePriceInEUR.setScale(2, RoundingMode.HALF_EVEN)))
+                holder.itemMetal.text = Utils.convertEpochTimeToDate(dataSet[position].epochtime, Locale.GERMANY)
             }
         }
 
