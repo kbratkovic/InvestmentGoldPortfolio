@@ -17,5 +17,4 @@ data class InvestmentItem(
     var purchasePriceInUSD: BigDecimal? = null,
     var purchasePriceInEUR: BigDecimal = BigDecimal.ZERO,
     var epochtime: Long = 0
-) {
-}
+)
