@@ -11,7 +11,10 @@ object MetalPriceApiComMapper {
             base = response.base,
             rates = MetalPriceApiCom.Rates(
                 EUR = response.rates.EUR,
-                XAU = response.rates.XAU
+                XAU = response.rates.XAU,
+                XAG = response.rates.XAG,
+                XPT = response.rates.XPT,
+                XPD = response.rates.XPD
             ),
             success = response.success,
             timestamp = response.timestamp

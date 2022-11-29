@@ -8,6 +8,9 @@ data class MetalPriceApiCom(
 ) {
     data class Rates(
         val EUR: Double,
-        val XAU: Double
+        val XAU: Double,
+        val XAG: Double,
+        val XPT: Double,
+        val XPD: Double
     )
 }

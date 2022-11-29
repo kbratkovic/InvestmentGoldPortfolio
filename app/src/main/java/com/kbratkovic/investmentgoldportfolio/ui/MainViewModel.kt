@@ -4,13 +4,7 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.domain.mappers.CurrencyExchangeRatesMapper
-import com.kbratkovic.investmentgoldportfolio.domain.mappers.GoldPriceMapper
 import com.kbratkovic.investmentgoldportfolio.domain.mappers.MetalPriceApiComMapper
-import com.kbratkovic.investmentgoldportfolio.domain.models.CurrencyRates
-import com.kbratkovic.investmentgoldportfolio.domain.models.GoldPrice
-import com.kbratkovic.investmentgoldportfolio.network.response.CurrencyExchangeRatesResponse
-import com.kbratkovic.investmentgoldportfolio.network.response.GoldPriceResponse
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceApiComResponse
