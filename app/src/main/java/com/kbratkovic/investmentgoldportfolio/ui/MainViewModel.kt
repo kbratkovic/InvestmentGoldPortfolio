@@ -78,4 +78,15 @@ class MainViewModel(
     }
 
 
+    fun deleteInvestmentItem(item: InvestmentItem) =
+        viewModelScope.launch {
+            repository.deleteInvestmentItem(item.id)
+        }
+
+
+    fun undoDeleteInvestmentItem(item: InvestmentItem) =
+        viewModelScope.launch {
+            repository.undoDeleteInvestmentItem(item.id)
+        }
+
 }

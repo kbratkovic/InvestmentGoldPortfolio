@@ -94,7 +94,7 @@ class AddNewItemFragment : Fragment() {
         getValuesFromDropdownMenus()
 
         if (!NetworkConnection.hasInternetConnection(requireContext())) {
-            mButtonSave.visibility = View.GONE
+//            mButtonSave.visibility = View.GONE
             val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
             if (bottomNavigationView != null) {
                 Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
@@ -102,17 +102,10 @@ class AddNewItemFragment : Fragment() {
             }
         }
         else {
-            mButtonSave.visibility = View.VISIBLE
+//            mButtonSave.visibility = View.VISIBLE
         }
     }
 
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("selectedMetal", mSelectedMetal)
-        outState.putString("selectedWeight", mSelectedWeight)
-        outState.putString("selectedCurrency", mSelectedCurrency)
-    }
 
     private fun getValuesFromDropdownMenus() {
         mSelectedMetal = mAutoCompleteTextViewMetal.text.toString()
@@ -207,15 +200,17 @@ class AddNewItemFragment : Fragment() {
                 }
             }
 
-            if (!NetworkConnection.hasInternetConnection(requireContext())) {
-                val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
-                if (bottomNavigationView != null) {
-                    Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
-                        getString(R.string.error_network_connection), bottomNavigationView)
-                }
-            } else {
-                saveInvestmentItem(mInvestmentItem)
-            }
+//            if (!NetworkConnection.hasInternetConnection(requireContext())) {
+//                val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+//                if (bottomNavigationView != null) {
+//                    Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+//                        getString(R.string.error_network_connection), bottomNavigationView)
+//                }
+//            } else {
+//                saveInvestmentItem(mInvestmentItem)
+//            }
+            saveInvestmentItem(mInvestmentItem)
+
         }
     } // handleButtonSave
 

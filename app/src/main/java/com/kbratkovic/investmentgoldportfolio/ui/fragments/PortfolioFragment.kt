@@ -8,19 +8,18 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.snackbar.Snackbar
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
-import com.kbratkovic.investmentgoldportfolio.util.Constants
-import com.kbratkovic.investmentgoldportfolio.util.NetworkConnection
-import com.kbratkovic.investmentgoldportfolio.util.Resource
-import com.kbratkovic.investmentgoldportfolio.util.Utils
+import com.kbratkovic.investmentgoldportfolio.util.*
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -67,6 +66,9 @@ class PortfolioFragment : Fragment() {
     private val mLocaleEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
 
+    private var mBottomNavigationView: BottomNavigationView? = null
+
+
     private val mMainViewModel: MainViewModel by activityViewModels()
 
 
@@ -90,6 +92,7 @@ class PortfolioFragment : Fragment() {
         handleRecyclerView()
         observeInvestmentItemsChange()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
+        enableSwipeToDeleteAndUndo()
 
     } // end onViewCreated
 
@@ -105,11 +108,11 @@ class PortfolioFragment : Fragment() {
         }
         else {
             hideLinearProgressIndicator()
-            val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
-            if (bottomNavigationView != null) {
+            if (mBottomNavigationView != null) {
                 // android.R.id.content gives you the root element of a view, without having to know its actual name/type/ID.
                 Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
-                    getString(R.string.error_network_connection), bottomNavigationView)
+                    getString(R.string.error_network_connection), mBottomNavigationView!!
+                )
             }
         }
 
@@ -336,6 +339,8 @@ class PortfolioFragment : Fragment() {
         mTotalWeightValue = view.findViewById(R.id.total_weight_value)
         mCurrentMarketValue = view.findViewById(R.id.current_market_value_value)
         mTotalProfitValue = view.findViewById(R.id.total_profit_value)
+
+        mBottomNavigationView = activity?.findViewById(R.id.bottom_navigation)
     }
 
 
@@ -353,6 +358,36 @@ class PortfolioFragment : Fragment() {
 
     fun hideLinearProgressIndicator() {
         mLinearProgressIndicator.visibility = View.GONE
+    }
+
+
+
+    private fun enableSwipeToDeleteAndUndo() {
+        val swipeToDeleteCallback: SwipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, i: Int) {
+                val position: Int = viewHolder.bindingAdapterPosition
+                val item: InvestmentItem = mPortfolioAdapter.getData()[position]
+                mMainViewModel.deleteInvestmentItem(item)
+                mPortfolioAdapter.removeItem(position)
+                Snackbar.make(
+                        requireActivity().findViewById(android.R.id.content),
+                        getString(R.string.info_item_removed),
+                        Snackbar.LENGTH_LONG
+                    ).apply {
+                        setAction(getString(R.string.undo), object : View.OnClickListener {
+                            override fun onClick(view: View?) {
+                                mMainViewModel.undoDeleteInvestmentItem(item)
+                                mPortfolioAdapter.restoreItem(item, position)
+                                mRecyclerView.scrollToPosition(position)
+                            }
+                        })
+                        setActionTextColor(Color.YELLOW)
+                        anchorView = mBottomNavigationView
+                    }.show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(mRecyclerView)
     }
 
 }

@@ -56,6 +56,8 @@
     <string name="total_purchase_price_holder">Total price: %1$s</string>
     <string name="error_network_connection">No Internet Connection</string>
     <string name="error_not_all_data_entered">Please enter required data.</string>
+    <string name="info_item_removed">Item removed successfully.</string>
+    <string name="undo">UNDO</string>
 
 
 </resources>

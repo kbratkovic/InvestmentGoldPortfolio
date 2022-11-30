@@ -18,6 +18,12 @@ class Repository(
     suspend fun addInvestmentItem(item: InvestmentItem) =
         db.investmentItemDao().addInvestmentItem(item)
 
+    suspend fun deleteInvestmentItem(id: Int) {
+        db.investmentItemDao().deleteInvestmentItem(id)
+    }
+
+    suspend fun undoDeleteInvestmentItem(id: Int) =
+        db.investmentItemDao().undoDeleteInvestmentItem(id)
 
 
     // api

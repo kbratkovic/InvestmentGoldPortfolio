@@ -1,5 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.ui.adapters
 
+
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +20,10 @@ import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
 
+
 class PortfolioAdapter(
     private var context: Context,
-    private var dataSet: List<InvestmentItem>,
+    private var dataSet: MutableList<InvestmentItem>,
     private var selectedCurrency: String,
     private var selectedWeight: String
     ) : RecyclerView.Adapter<PortfolioAdapter.ViewHolder>()
@@ -94,11 +96,25 @@ class PortfolioAdapter(
     }
 
 
-    fun sendDataToAdapter(dataSet: List<InvestmentItem>, currency: String, weight: String) {
+    fun sendDataToAdapter(dataSet: MutableList<InvestmentItem>, currency: String, weight: String) {
         this.dataSet = dataSet
         this.selectedCurrency = currency
         this.selectedWeight = weight
         notifyDataSetChanged()
     }
 
+
+    fun removeItem(position: Int) {
+        dataSet.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun restoreItem(item: InvestmentItem, position: Int) {
+        dataSet.add(position, item)
+        notifyItemInserted(position)
+    }
+
+    fun getData(): MutableList<InvestmentItem> {
+        return dataSet
+    }
 }

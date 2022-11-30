@@ -16,5 +16,6 @@ data class InvestmentItem(
     var numberOfUnitsPurchased: Int = 0,
     var purchasePriceInUSD: BigDecimal? = null,
     var purchasePriceInEUR: BigDecimal = BigDecimal.ZERO,
-    var epochtime: Long = 0
+    var epochtime: Long = 0,
+    var deleted: Int = 0
 )
