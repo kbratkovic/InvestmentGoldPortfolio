@@ -13,7 +13,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
-import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
@@ -94,7 +94,7 @@ class AddNewItemFragment : Fragment() {
         getValuesFromDropdownMenus()
 
         if (!NetworkConnection.hasInternetConnection(requireContext())) {
-//            mButtonSave.visibility = View.GONE
+            mButtonSave.visibility = View.GONE
             val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
             if (bottomNavigationView != null) {
                 Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
@@ -102,7 +102,7 @@ class AddNewItemFragment : Fragment() {
             }
         }
         else {
-//            mButtonSave.visibility = View.VISIBLE
+            mButtonSave.visibility = View.VISIBLE
         }
     }
 
@@ -136,7 +136,7 @@ class AddNewItemFragment : Fragment() {
 
 
     private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
-        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
+        mMainViewModel.metalPrice.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     response.data?.let { metalPrice ->
@@ -157,7 +157,7 @@ class AddNewItemFragment : Fragment() {
     } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
 
 
-    private fun calculateExchangeRates(metalPrice: MetalPriceApiCom) {
+    private fun calculateExchangeRates(metalPrice: MetalPrice) {
         mExchangeRateUSD = (1).div(metalPrice.rates.EUR)
         mExchangeRateEUR = metalPrice.rates.EUR
     } // calculateExchangeRatesAndGoldPrices
@@ -200,16 +200,15 @@ class AddNewItemFragment : Fragment() {
                 }
             }
 
-//            if (!NetworkConnection.hasInternetConnection(requireContext())) {
-//                val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
-//                if (bottomNavigationView != null) {
-//                    Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
-//                        getString(R.string.error_network_connection), bottomNavigationView)
-//                }
-//            } else {
-//                saveInvestmentItem(mInvestmentItem)
-//            }
-            saveInvestmentItem(mInvestmentItem)
+            if (!NetworkConnection.hasInternetConnection(requireContext())) {
+                val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
+                if (bottomNavigationView != null) {
+                    Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
+                        getString(R.string.error_network_connection), bottomNavigationView)
+                }
+            } else {
+                saveInvestmentItem(mInvestmentItem)
+            }
 
         }
     } // handleButtonSave

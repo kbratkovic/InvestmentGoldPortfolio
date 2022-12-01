@@ -4,10 +4,10 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.domain.mappers.MetalPriceApiComMapper
+import com.kbratkovic.investmentgoldportfolio.domain.mappers.MetalPriceMapper
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
-import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
-import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceApiComResponse
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
+import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceResponse
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
 import com.kbratkovic.investmentgoldportfolio.util.Constants
 import com.kbratkovic.investmentgoldportfolio.util.Resource
@@ -33,32 +33,31 @@ class MainViewModel(
     }
 
 
-//    private val _allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
     val allInvestmentItems: LiveData<List<InvestmentItem>> = repository.getAllInvestmentItems
 
-    private val _currentGoldPriceFromMetalPriceApiCom: MutableLiveData<Resource<MetalPriceApiCom>> = MutableLiveData()
-    val currentGoldPriceFromMetalPriceApiCom: LiveData<Resource<MetalPriceApiCom>> = _currentGoldPriceFromMetalPriceApiCom
+    private val _metalPrice: MutableLiveData<Resource<MetalPrice>> = MutableLiveData()
+    val metalPrice: LiveData<Resource<MetalPrice>> = _metalPrice
 
 
-    // Current Gold Price From MetalPriceApi.com
-    fun getCurrentGoldPriceFromMetalPriceApiCom() = viewModelScope.launch {
-        _currentGoldPriceFromMetalPriceApiCom.postValue(Resource.Loading())
+    // API
+    fun getMetalPriceFromApi() = viewModelScope.launch {
+        _metalPrice.postValue(Resource.Loading())
 
         try {
-            val response = repository.getCurrentGoldPriceFromMetalPriceApiCom(Constants.METAL_PRICE_API_COM_KEY, Constants.CURRENCY_USD_CODE,
+            val response = repository.getMetalPriceFromApi(Constants.API_KEY, Constants.CURRENCY_USD_CODE,
                 "${Constants.CURRENCY_EUR_CODE},${Constants.GOLD_CODE},${Constants.SILVER_CODE},${Constants.PLATINUM_CODE},${Constants.PALLADIUM_CODE}")
-            _currentGoldPriceFromMetalPriceApiCom.postValue(handleCurrentGoldPriceFromMetalPriceApiCo(response))
+            _metalPrice.postValue(handleMetalPriceFromApi(response))
         } catch (e: SocketTimeoutException) {
             Timber.e(e.localizedMessage)
             mOnDataChangeListener?.onDataChanged(context.getString(R.string.network_error))
         }
     }
 
-    private fun handleCurrentGoldPriceFromMetalPriceApiCo(response: Response<MetalPriceApiComResponse>) : Resource<MetalPriceApiCom> {
+    private fun handleMetalPriceFromApi(response: Response<MetalPriceResponse>) : Resource<MetalPrice> {
         if (response.isSuccessful) {
-            response.body()?.let { goldPrice ->
-                if (goldPrice.success)
-                    return Resource.Success(MetalPriceApiComMapper.buildFrom(goldPrice))
+            response.body()?.let { metalPriceResponse ->
+                if (metalPriceResponse.success)
+                    return Resource.Success(MetalPriceMapper.buildFrom(metalPriceResponse))
                 else
                     return Resource.Error(response.message())
             }
@@ -67,14 +66,13 @@ class MainViewModel(
     }
 
 
-    // Add New Gold Item To DB
-    fun addInvestmentItem(item: InvestmentItem) =  viewModelScope.launch {
-        try {
+
+
+    // Database
+    fun addInvestmentItem(item: InvestmentItem) =
+        viewModelScope.launch {
             repository.addInvestmentItem(item)
             Toast.makeText(context, "Item saved successfully",Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(context, "Save error!",Toast.LENGTH_SHORT).show()
-        }
     }
 
 

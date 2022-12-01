@@ -1,15 +1,15 @@
 package com.kbratkovic.investmentgoldportfolio.domain.mappers
 
-import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
-import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceApiComResponse
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
+import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceResponse
 
 
-object MetalPriceApiComMapper {
+object MetalPriceMapper {
 
-    fun buildFrom(response: MetalPriceApiComResponse): MetalPriceApiCom {
-        return MetalPriceApiCom(
+    fun buildFrom(response: MetalPriceResponse): MetalPrice {
+        return MetalPrice(
             base = response.base,
-            rates = MetalPriceApiCom.Rates(
+            rates = MetalPrice.Rates(
                 EUR = response.rates.EUR,
                 XAU = response.rates.XAU,
                 XAG = response.rates.XAG,

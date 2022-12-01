@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kbratkovic.investmentgoldportfolio.R
-import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
@@ -90,10 +90,10 @@ class MarketPricesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeLayoutViews(view)
-//        startOnDataChangeListener()
         setDefaultValueInDropDownMenu()
         displayDefaultZeroValues()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
+
     } // onViewCreated
 
 
@@ -109,7 +109,7 @@ class MarketPricesFragment : Fragment() {
                     getString(R.string.error_network_connection), bottomNavigationView)
             }
         }
-    }
+    } // onResume
 
 
     private fun initializeLayoutViews(view: View) {
@@ -125,22 +125,11 @@ class MarketPricesFragment : Fragment() {
         mTextViewPlatinumCurrentPrice = view.findViewById(R.id.platinum_current_price)
         mTextViewPalladiumCurrentPrice = view.findViewById(R.id.palladium_current_price)
 
-    }
-
-
-//    private fun startOnDataChangeListener() {
-//        mMainViewModel.setOnDataChangeListener(object: MainViewModel.OnDataChangeListener {
-//            override fun onDataChanged(message: String?) {
-//                if (message.equals(getString(R.string.network_error))) {
-//                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        })
-//    }
+    } // initializeLayoutViews
 
 
     private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
-        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
+        mMainViewModel.metalPrice.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     response.data?.let { metalPrice ->
@@ -180,7 +169,7 @@ class MarketPricesFragment : Fragment() {
     } // observeCurrentGoldPriceChangeFromMetalPriceApiCom
 
 
-    private fun calculateExchangeRatesAndGoldPrices(metalPrice: MetalPriceApiCom) {
+    private fun calculateExchangeRatesAndGoldPrices(metalPrice: MetalPrice) {
         mExchangeRateUSD = (1).div(metalPrice.rates.EUR)
         mExchangeRateEUR = metalPrice.rates.EUR
 
@@ -205,13 +194,13 @@ class MarketPricesFragment : Fragment() {
         mPriceOfOneGramOfPalladiumInEUR = mPriceOfOneOztOfPalladiumInEUR.div(CONVERT_TROY_OUNCE_CODE)
     }
 
-    private fun displayDateAndTime(metalPrice: MetalPriceApiCom) {
+    private fun displayDateAndTime(metalPrice: MetalPrice) {
         mTextViewTimeAndDate.text =
             getString(R.string.time_and_date, formatDateAndTime(metalPrice))
     }
 
 
-    private fun formatDateAndTime(metalPrice: MetalPriceApiCom) : String {
+    private fun formatDateAndTime(metalPrice: MetalPrice) : String {
         val date = Date(metalPrice.timestamp.toLong() * 1000)
         val dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
         val timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.US)
@@ -330,9 +319,15 @@ class MarketPricesFragment : Fragment() {
         when (mSelectedCurrency) {
             CURRENCY_USD_CODE -> {
                 mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewSilverCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewPlatinumCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewPalladiumCurrentPrice.text = mLocaleUS.format(0)
             }
             CURRENCY_EUR_CODE -> {
                 mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewSilverCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewPlatinumCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewPalladiumCurrentPrice.text = mLocaleEUR.format(0)
             }
         }
     }

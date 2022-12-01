@@ -1,6 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.network
 
-import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceApiComResponse
+import com.kbratkovic.investmentgoldportfolio.network.response.MetalPriceResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -8,11 +8,11 @@ import retrofit2.http.Query
 
 interface ApiService {
 
-    @GET("https://api.metalpriceapi.com/v1/latest/")
-    suspend fun getCurrentGoldPriceFromMetalPriceApiCom(
+    @GET("latest/")
+    suspend fun getMetalPriceFromApi(
         @Query("api_key") api_key: String,
         @Query("base") base: String,
         @Query("currencies") currencies: String
-    ): Response<MetalPriceApiComResponse>
+    ): Response<MetalPriceResponse>
 
 }

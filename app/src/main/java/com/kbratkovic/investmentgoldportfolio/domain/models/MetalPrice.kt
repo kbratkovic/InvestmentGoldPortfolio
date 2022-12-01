@@ -1,6 +1,6 @@
-package com.kbratkovic.investmentgoldportfolio.network.response
+package com.kbratkovic.investmentgoldportfolio.domain.models
 
-data class MetalPriceApiComResponse(
+data class MetalPrice(
     val base: String,
     val rates: Rates,
     val success: Boolean,

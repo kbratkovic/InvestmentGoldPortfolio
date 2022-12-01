@@ -1,17 +1,15 @@
 package com.kbratkovic.investmentgoldportfolio.network
 
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_PRICE_BASE_URL
+import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.BASE_API_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitInstance {
 
-
     companion object {
         private val retrofit by lazy {
             Retrofit.Builder()
-                .baseUrl(GOLD_PRICE_BASE_URL)
-//                .baseUrl(RATES_BASE_URL)
+                .baseUrl(BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }

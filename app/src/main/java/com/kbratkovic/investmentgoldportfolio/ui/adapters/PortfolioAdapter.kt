@@ -104,17 +104,7 @@ class PortfolioAdapter(
     }
 
 
-    fun removeItem(position: Int) {
-        dataSet.removeAt(position)
-        notifyItemRemoved(position)
-    }
-
-    fun restoreItem(item: InvestmentItem, position: Int) {
-        dataSet.add(position, item)
-        notifyItemInserted(position)
-    }
-
-    fun getData(): MutableList<InvestmentItem> {
+    fun getDataSet(): MutableList<InvestmentItem> {
         return dataSet
     }
 }

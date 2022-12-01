@@ -17,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.InvestmentItem
-import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPriceApiCom
+import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
 import com.kbratkovic.investmentgoldportfolio.ui.adapters.PortfolioAdapter
 import com.kbratkovic.investmentgoldportfolio.util.*
 import timber.log.Timber
@@ -90,6 +90,7 @@ class PortfolioFragment : Fragment() {
         startOnDataChangeListener()
         getValuesFromDropdownMenus()
         handleRecyclerView()
+        displayDefaultZeroValues()
         observeInvestmentItemsChange()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
         enableSwipeToDeleteAndUndo()
@@ -100,11 +101,10 @@ class PortfolioFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         handleDropDownMenus()
-        displayDefaultZeroValues()
 
 
         if (NetworkConnection.hasInternetConnection(requireContext())) {
-            mMainViewModel.getCurrentGoldPriceFromMetalPriceApiCom()
+            mMainViewModel.getMetalPriceFromApi()
         }
         else {
             hideLinearProgressIndicator()
@@ -191,7 +191,7 @@ class PortfolioFragment : Fragment() {
                 mTotalPurchasePriceValue.text = mLocaleEUR.format(mTotalPurchasePriceInEUR)
             }
         }
-    }
+    } // setTotalPurchasePrice
 
 
     private fun setTotalWeight() {
@@ -213,7 +213,7 @@ class PortfolioFragment : Fragment() {
                     )
             }
         }
-    }
+    } // setTotalWeight
 
 
     private fun setCurrentMarketValue() {
@@ -228,11 +228,10 @@ class PortfolioFragment : Fragment() {
                 mCurrentMarketValue.text = mLocaleEUR.format(mTotalValueInEUR)
             }
         }
-    } // setTotalCurrentValue
+    } // setCurrentMarketValue
 
 
     private fun setTotalProfitValue() {
-        displayDefaultZeroValues()
         if (mApiResponse) {
             when (mSelectedCurrency) {
                 Constants.CURRENCY_USD_CODE -> {
@@ -256,7 +255,7 @@ class PortfolioFragment : Fragment() {
     } // setTotalProfitValue
 
 
-    private fun calculateExchangeRatesAndGoldPrices(metalPrice: MetalPriceApiCom) {
+    private fun calculateExchangeRatesAndGoldPrices(metalPrice: MetalPrice) {
         mExchangeRateUSD = (1).div(metalPrice.rates.EUR)
         mExchangeRateEUR = metalPrice.rates.EUR
 
@@ -288,7 +287,7 @@ class PortfolioFragment : Fragment() {
 
 
     private fun observeCurrentGoldPriceChangeFromMetalPriceApiCom() {
-        mMainViewModel.currentGoldPriceFromMetalPriceApiCom.observe(viewLifecycleOwner) { response ->
+        mMainViewModel.metalPrice.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     hideLinearProgressIndicator()
@@ -366,9 +365,8 @@ class PortfolioFragment : Fragment() {
         val swipeToDeleteCallback: SwipeToDeleteCallback = object : SwipeToDeleteCallback(requireContext()) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, i: Int) {
                 val position: Int = viewHolder.bindingAdapterPosition
-                val item: InvestmentItem = mPortfolioAdapter.getData()[position]
+                val item: InvestmentItem = mPortfolioAdapter.getDataSet()[position]
                 mMainViewModel.deleteInvestmentItem(item)
-                mPortfolioAdapter.removeItem(position)
                 Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
                         getString(R.string.info_item_removed),
@@ -377,7 +375,6 @@ class PortfolioFragment : Fragment() {
                         setAction(getString(R.string.undo), object : View.OnClickListener {
                             override fun onClick(view: View?) {
                                 mMainViewModel.undoDeleteInvestmentItem(item)
-                                mPortfolioAdapter.restoreItem(item, position)
                                 mRecyclerView.scrollToPosition(position)
                             }
                         })
