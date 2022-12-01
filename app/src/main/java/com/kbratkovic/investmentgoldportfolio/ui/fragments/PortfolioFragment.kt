@@ -58,8 +58,8 @@ class PortfolioFragment : Fragment() {
     private var mTotalWeightInGrams = 0.0
     private var mTotalWeightInTroyOunce = 0.0
 
-    private var mTotalValueInUSD = BigDecimal.ZERO
-    private var mTotalValueInEUR = BigDecimal.ZERO
+    private var mCurrentMarketValueInUSD = BigDecimal.ZERO
+    private var mCurrentMarketValueInEUR = BigDecimal.ZERO
 
     private var mApiResponse = false
 
@@ -217,15 +217,15 @@ class PortfolioFragment : Fragment() {
 
 
     private fun setCurrentMarketValue() {
-        mTotalValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInUSD.toBigDecimal())
-        mTotalValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInEUR.toBigDecimal())
+        mCurrentMarketValueInUSD = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInUSD.toBigDecimal())
+        mCurrentMarketValueInEUR = mTotalWeightInGrams.toBigDecimal().multiply(mPriceOfOneGramOfGoldInEUR.toBigDecimal())
 
         when (mSelectedCurrency) {
             Constants.CURRENCY_USD_CODE -> {
-                mCurrentMarketValue.text = mLocaleUS.format(mTotalValueInUSD)
+                mCurrentMarketValue.text = mLocaleUS.format(mCurrentMarketValueInUSD)
             }
             Constants.CURRENCY_EUR_CODE -> {
-                mCurrentMarketValue.text = mLocaleEUR.format(mTotalValueInEUR)
+                mCurrentMarketValue.text = mLocaleEUR.format(mCurrentMarketValueInEUR)
             }
         }
     } // setCurrentMarketValue
@@ -235,7 +235,7 @@ class PortfolioFragment : Fragment() {
         if (mApiResponse) {
             when (mSelectedCurrency) {
                 Constants.CURRENCY_USD_CODE -> {
-                    val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
+                    val totalProfit = mCurrentMarketValueInUSD.minus(mTotalPurchasePriceInUSD)
                     if (totalProfit < BigDecimal.ZERO)
                         mTotalProfitValue.setTextColor(Color.RED)
                     else if (totalProfit > BigDecimal.ZERO)
@@ -243,7 +243,7 @@ class PortfolioFragment : Fragment() {
                     mTotalProfitValue.text = mLocaleUS.format(totalProfit)
                 }
                 Constants.CURRENCY_EUR_CODE -> {
-                    val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
+                    val totalProfit = mCurrentMarketValueInEUR.minus(mTotalPurchasePriceInEUR)
                     if (totalProfit < BigDecimal.ZERO)
                         mTotalProfitValue.setTextColor(Color.RED)
                     else if (totalProfit > BigDecimal.ZERO)
@@ -282,6 +282,8 @@ class PortfolioFragment : Fragment() {
 
             setTotalPurchasePrice()
             setTotalWeight()
+            setCurrentMarketValue()
+            setTotalProfitValue()
         }
     } // observeInvestmentItemsChange
 
