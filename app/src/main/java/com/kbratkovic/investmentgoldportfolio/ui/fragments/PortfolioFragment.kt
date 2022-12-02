@@ -1,5 +1,7 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -61,12 +63,13 @@ class PortfolioFragment : Fragment() {
     private var mTotalValueInUSD = BigDecimal.ZERO
     private var mTotalValueInEUR = BigDecimal.ZERO
 
-    private var mApiResponse = false
+    private var mIsApiResponseTrue = false
 
     private val mLocaleEUR = NumberFormat.getCurrencyInstance(Locale.GERMANY)
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
 
     private var mBottomNavigationView: BottomNavigationView? = null
+    private lateinit var sharedPreference: SharedPreferences
 
 
     private val mMainViewModel: MainViewModel by activityViewModels()
@@ -86,10 +89,12 @@ class PortfolioFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getSharedPreference()
         initializeLayoutViews(view)
         startOnDataChangeListener()
         getValuesFromDropdownMenus()
-        handleRecyclerView()
+        getValuesFromSharedPreferences()
+        handleRecyclerViewAndAdapter()
         displayDefaultZeroValues()
         observeInvestmentItemsChange()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
@@ -100,9 +105,45 @@ class PortfolioFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
         handleDropDownMenus()
+        setValueToDropDownMenu()
+        getMetalPriceFromApi()
+    } // onResume
 
 
+    override fun onPause() {
+        super.onPause()
+        putValuesToSharedPreferences()
+    }
+
+
+    private fun getSharedPreference() {
+        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME", MODE_PRIVATE)
+    }
+
+
+    private fun getValuesFromSharedPreferences() {
+        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
+        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+    }
+
+
+    private fun putValuesToSharedPreferences() {
+        val editor = sharedPreference.edit()
+        editor.putString("currency", mSelectedCurrency)
+        editor.putString("weight", mSelectedWeight)
+        editor.apply()
+    }
+
+
+    private fun setValueToDropDownMenu() {
+        mAutoCompleteTextViewCurrency.setText(mSelectedCurrency, false)
+        mAutoCompleteTextViewWeight.setText(mSelectedWeight, false)
+    }
+
+
+    private fun getMetalPriceFromApi() {
         if (NetworkConnection.hasInternetConnection(requireContext())) {
             mMainViewModel.getMetalPriceFromApi()
         }
@@ -115,8 +156,7 @@ class PortfolioFragment : Fragment() {
                 )
             }
         }
-
-    } // onResume
+    }
 
 
     private fun displayDefaultZeroValues() {
@@ -152,7 +192,6 @@ class PortfolioFragment : Fragment() {
         val arrayAdapterCurrency =
             ArrayAdapter(requireContext(), R.layout.item_menu_dropdown, currencyDropdownList)
         mAutoCompleteTextViewCurrency.setAdapter(arrayAdapterCurrency)
-
 
         mAutoCompleteTextViewCurrency.onItemClickListener = object : AdapterView.OnItemClickListener {
                 override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
@@ -232,24 +271,29 @@ class PortfolioFragment : Fragment() {
 
 
     private fun setTotalProfitValue() {
-        if (mApiResponse) {
-            when (mSelectedCurrency) {
-                Constants.CURRENCY_USD_CODE -> {
-                    val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
-                    if (totalProfit < BigDecimal.ZERO)
-                        mTotalProfitValue.setTextColor(Color.RED)
-                    else if (totalProfit > BigDecimal.ZERO)
-                        mTotalProfitValue.setTextColor(Color.GREEN)
-                    mTotalProfitValue.text = mLocaleUS.format(totalProfit)
-                }
-                Constants.CURRENCY_EUR_CODE -> {
-                    val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
-                    if (totalProfit < BigDecimal.ZERO)
-                        mTotalProfitValue.setTextColor(Color.RED)
-                    else if (totalProfit > BigDecimal.ZERO)
-                        mTotalProfitValue.setTextColor(Color.GREEN)
-                    mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
-                }
+        // if no api response Total Profit will be negative Total Purchase Price
+        when (mSelectedCurrency) {
+            Constants.CURRENCY_USD_CODE -> {
+                val totalProfit = mTotalValueInUSD.minus(mTotalPurchasePriceInUSD)
+                if (totalProfit < BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.RED)
+                else if (totalProfit > BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.GREEN)
+                mTotalProfitValue.text = mLocaleUS.format(totalProfit)
+
+                if (!mIsApiResponseTrue)
+                    mTotalProfitValue.text = mLocaleUS.format(0)
+            }
+            Constants.CURRENCY_EUR_CODE -> {
+                val totalProfit = mTotalValueInEUR.minus(mTotalPurchasePriceInEUR)
+                if (totalProfit < BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.RED)
+                else if (totalProfit > BigDecimal.ZERO)
+                    mTotalProfitValue.setTextColor(Color.GREEN)
+                mTotalProfitValue.text = mLocaleEUR.format(totalProfit)
+
+                if (!mIsApiResponseTrue)
+                    mTotalProfitValue.text = mLocaleEUR.format(0)
             }
         }
     } // setTotalProfitValue
@@ -282,6 +326,8 @@ class PortfolioFragment : Fragment() {
 
             setTotalPurchasePrice()
             setTotalWeight()
+            setCurrentMarketValue()
+            setTotalProfitValue()
         }
     } // observeInvestmentItemsChange
 
@@ -292,7 +338,7 @@ class PortfolioFragment : Fragment() {
                 is Resource.Success -> {
                     hideLinearProgressIndicator()
                     response.data?.let { metalPrice ->
-                        mApiResponse = true
+                        mIsApiResponseTrue = true
                         calculateExchangeRatesAndGoldPrices(metalPrice)
                         setCurrentMarketValue()
                         setTotalProfitValue()
@@ -300,7 +346,7 @@ class PortfolioFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     response.message?.let { message ->
-                        mApiResponse = false
+                        mIsApiResponseTrue = false
                         hideLinearProgressIndicator()
                         val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
                         toast.show()
@@ -343,7 +389,7 @@ class PortfolioFragment : Fragment() {
     }
 
 
-    private fun handleRecyclerView() {
+    private fun handleRecyclerViewAndAdapter() {
         mPortfolioAdapter = PortfolioAdapter(requireContext(), mDataSet, mSelectedCurrency, mSelectedWeight)
         mRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         mRecyclerView.adapter = mPortfolioAdapter
@@ -358,7 +404,6 @@ class PortfolioFragment : Fragment() {
     fun hideLinearProgressIndicator() {
         mLinearProgressIndicator.visibility = View.GONE
     }
-
 
 
     private fun enableSwipeToDeleteAndUndo() {

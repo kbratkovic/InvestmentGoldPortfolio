@@ -59,20 +59,18 @@ class MainViewModel(
                 if (metalPriceResponse.success)
                     return Resource.Success(MetalPriceMapper.buildFrom(metalPriceResponse))
                 else
-                    return Resource.Error(response.message())
+                    return Resource.Error(context.getString(R.string.network_error))
             }
         }
         return Resource.Error(response.message())
     }
 
 
-
-
     // Database
     fun addInvestmentItem(item: InvestmentItem) =
         viewModelScope.launch {
             repository.addInvestmentItem(item)
-            Toast.makeText(context, "Item saved successfully",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.message_save_successfull),Toast.LENGTH_SHORT).show()
     }
 
 

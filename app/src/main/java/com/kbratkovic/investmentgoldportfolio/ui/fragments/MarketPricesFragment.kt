@@ -1,6 +1,8 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +16,6 @@ import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
 import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_USD_CODE
-import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.GOLD_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CONVERT_TROY_OUNCE_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.CURRENCY_EUR_CODE
 import com.kbratkovic.investmentgoldportfolio.util.Constants.Companion.WEIGHT_GRAM_CODE
@@ -41,9 +42,8 @@ class MarketPricesFragment : Fragment() {
 
     private lateinit var mPricesContainer: ConstraintLayout
 
-    private lateinit var mSelectedMetal: String
-    private lateinit var mSelectedWeight: String
-    private lateinit var mSelectedCurrency: String
+    private var mSelectedWeight = ""
+    private var mSelectedCurrency = ""
 
     private var mLocaleUS =  NumberFormat.getCurrencyInstance(Locale.US)
     private var mLocaleEUR =  NumberFormat.getCurrencyInstance(Locale.GERMANY)
@@ -71,6 +71,8 @@ class MarketPricesFragment : Fragment() {
     private var mExchangeRateUSD = 0.0
     private var mExchangeRateEUR = 0.0
 
+    private lateinit var sharedPreference: SharedPreferences
+
     private val mMainViewModel: MainViewModel by activityViewModels()
 
 
@@ -89,8 +91,9 @@ class MarketPricesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getSharedPreference()
         initializeLayoutViews(view)
-        setDefaultValueInDropDownMenu()
+        getValuesFromSharedPreferences()
         displayDefaultZeroValues()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
@@ -99,9 +102,48 @@ class MarketPricesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        handleDropDownMenus()
-        setDefaultValueInDropDownMenu()
 
+        handleDropDownMenus()
+        setValueToDropDownMenu()
+        displayCurrentMarketPrices()
+        checkifHasInternetConnection()
+    } // onResume
+
+
+    override fun onPause() {
+        super.onPause()
+        putValuesToSharedPreferences()
+    }
+
+
+    private fun getSharedPreference() {
+        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME",
+            Context.MODE_PRIVATE
+        )
+    }
+
+
+    private fun getValuesFromSharedPreferences() {
+        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
+        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+    }
+
+
+    private fun putValuesToSharedPreferences() {
+        val editor = sharedPreference.edit()
+        editor.putString("currency", mSelectedCurrency)
+        editor.putString("weight", mSelectedWeight)
+        editor.apply()
+    }
+
+
+    private fun setValueToDropDownMenu() {
+        mAutoCompleteTextViewCurrency.setText(mSelectedCurrency, false)
+        mAutoCompleteTextViewWeight.setText(mSelectedWeight, false)
+    }
+
+
+    private fun checkifHasInternetConnection() {
         if (!NetworkConnection.hasInternetConnection(requireContext())) {
             val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
             if (bottomNavigationView != null) {
@@ -109,7 +151,7 @@ class MarketPricesFragment : Fragment() {
                     getString(R.string.error_network_connection), bottomNavigationView)
             }
         }
-    } // onResume
+    }
 
 
     private fun initializeLayoutViews(view: View) {
@@ -136,23 +178,7 @@ class MarketPricesFragment : Fragment() {
                         showPricesContainer()
                         displayDateAndTime(metalPrice)
                         calculateExchangeRatesAndGoldPrices(metalPrice)
-
-                        when (mSelectedCurrency) {
-                            CURRENCY_USD_CODE -> {
-                                mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
-                                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                    displayPricesInUSDAndTroyOunce()
-                                if (mSelectedWeight == WEIGHT_GRAM_CODE)
-                                    displayPricesInUSDAndGrams()
-                            }
-                            CURRENCY_EUR_CODE -> {
-                                mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
-                                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                    displayPricesInEURAndTroyOunce()
-                                if (mSelectedWeight == WEIGHT_GRAM_CODE)
-                                    displayPricesInEURAndGrams()
-                            }
-                        }
+                        displayCurrentMarketPrices()
                     }
                 }
                 is Resource.Error -> {
@@ -248,25 +274,47 @@ class MarketPricesFragment : Fragment() {
             override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 if (p2 >= 0) {
                     mSelectedCurrency = p0?.getItemAtPosition(p2) as String
-
-                    when (mSelectedCurrency) {
-                        CURRENCY_EUR_CODE -> {
-                            if (mSelectedWeight == WEIGHT_GRAM_CODE)
-                                displayPricesInEURAndGrams()
-                            if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                displayPricesInEURAndTroyOunce()
-                        }
-                        CURRENCY_USD_CODE -> {
-                            if (mSelectedWeight == WEIGHT_GRAM_CODE)
-                                displayPricesInUSDAndGrams()
-                            if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
-                                displayPricesInUSDAndTroyOunce()
-                        }
-                    }
+                    displayCurrentMarketPrices()
                 }
             }
         }
     } // handleDropDownMenus
+
+
+    private fun displayCurrentMarketPrices() {
+        when (mSelectedCurrency) {
+            CURRENCY_EUR_CODE -> {
+                if (mSelectedWeight == WEIGHT_GRAM_CODE)
+                    displayPricesInEURAndGrams()
+                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                    displayPricesInEURAndTroyOunce()
+            }
+            CURRENCY_USD_CODE -> {
+                if (mSelectedWeight == WEIGHT_GRAM_CODE)
+                    displayPricesInUSDAndGrams()
+                if (mSelectedWeight == WEIGHT_TROY_OUNCE_CODE)
+                    displayPricesInUSDAndTroyOunce()
+            }
+        }
+    }
+
+
+    private fun displayDefaultZeroValues() {
+        when (mSelectedCurrency) {
+            CURRENCY_USD_CODE -> {
+                mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewSilverCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewPlatinumCurrentPrice.text = mLocaleUS.format(0)
+                mTextViewPalladiumCurrentPrice.text = mLocaleUS.format(0)
+            }
+            CURRENCY_EUR_CODE -> {
+                mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewSilverCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewPlatinumCurrentPrice.text = mLocaleEUR.format(0)
+                mTextViewPalladiumCurrentPrice.text = mLocaleEUR.format(0)
+            }
+        }
+    }
 
 
     private fun displayPricesInUSDAndTroyOunce() {
@@ -306,30 +354,5 @@ class MarketPricesFragment : Fragment() {
     }
 
 
-    private fun setDefaultValueInDropDownMenu() {
-        mSelectedMetal = GOLD_CODE
-        mSelectedWeight = WEIGHT_TROY_OUNCE_CODE
-        mSelectedCurrency = CURRENCY_USD_CODE
-        mAutoCompleteTextViewCurrency.setText(CURRENCY_USD_CODE, false)
-        mAutoCompleteTextViewWeight.setText(WEIGHT_TROY_OUNCE_CODE, false)
-    }
-
-
-    private fun displayDefaultZeroValues() {
-        when (mSelectedCurrency) {
-            CURRENCY_USD_CODE -> {
-                mTextViewGoldCurrentPrice.text = mLocaleUS.format(0)
-                mTextViewSilverCurrentPrice.text = mLocaleUS.format(0)
-                mTextViewPlatinumCurrentPrice.text = mLocaleUS.format(0)
-                mTextViewPalladiumCurrentPrice.text = mLocaleUS.format(0)
-            }
-            CURRENCY_EUR_CODE -> {
-                mTextViewGoldCurrentPrice.text = mLocaleEUR.format(0)
-                mTextViewSilverCurrentPrice.text = mLocaleEUR.format(0)
-                mTextViewPlatinumCurrentPrice.text = mLocaleEUR.format(0)
-                mTextViewPalladiumCurrentPrice.text = mLocaleEUR.format(0)
-            }
-        }
-    }
 
 }

@@ -1,5 +1,7 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -61,6 +63,8 @@ class AddNewItemFragment : Fragment() {
 
     private var mInvestmentItem = InvestmentItem()
 
+    private lateinit var sharedPreference: SharedPreferences
+
     private val mMainViewModel: MainViewModel by activityViewModels()
 
 
@@ -78,23 +82,61 @@ class AddNewItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getSharedPreference()
         initializeLayoutViews(view)
-        handleDropDownMenus()
+        getValuesFromSharedPreferences()
         handleButtonSave()
         handleEditTextFocusListeners()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
-
     } // end onViewCreated
 
 
     override fun onResume() {
         super.onResume()
+
         handleDropDownMenus()
         handleEditTextFocusListeners()
-        getValuesFromDropdownMenus()
+        setValueToDropDownMenu()
+        hideOrShowStartButtonIfNetwork()
+    }
 
+
+    override fun onPause() {
+        super.onPause()
+        putValuesToSharedPreferences()
+    }
+
+
+    private fun getSharedPreference() {
+        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME",
+            Context.MODE_PRIVATE
+        )
+    }
+
+
+    private fun getValuesFromSharedPreferences() {
+        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
+        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+    }
+
+
+    private fun putValuesToSharedPreferences() {
+        val editor = sharedPreference.edit()
+        editor.putString("currency", mSelectedCurrency)
+        editor.putString("weight", mSelectedWeight)
+        editor.apply()
+    }
+
+
+    private fun setValueToDropDownMenu() {
+        mAutoCompleteTextViewCurrency.setText(mSelectedCurrency, false)
+        mAutoCompleteTextViewWeight.setText(mSelectedWeight, false)
+    }
+
+
+    private fun hideOrShowStartButtonIfNetwork() {
         if (!NetworkConnection.hasInternetConnection(requireContext())) {
-            mButtonSave.visibility = View.GONE
+            mButtonSave.isEnabled = false
             val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
             if (bottomNavigationView != null) {
                 Utils.showSnackBar(requireActivity().findViewById(android.R.id.content),
@@ -102,15 +144,8 @@ class AddNewItemFragment : Fragment() {
             }
         }
         else {
-            mButtonSave.visibility = View.VISIBLE
+            mButtonSave.isEnabled = true
         }
-    }
-
-
-    private fun getValuesFromDropdownMenus() {
-        mSelectedMetal = mAutoCompleteTextViewMetal.text.toString()
-        mSelectedWeight = mAutoCompleteTextViewWeight.text.toString()
-        mSelectedCurrency = mAutoCompleteTextViewCurrency.text.toString()
     }
 
 

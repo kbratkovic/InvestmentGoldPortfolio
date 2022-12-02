@@ -2,12 +2,8 @@ package com.kbratkovic.investmentgoldportfolio.ui
 
 
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -35,11 +31,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mToolbar: Toolbar
     private var materialSwitch: MaterialSwitch? = null
 
-    private val mPortfolioFragment = PortfolioFragment()
+    private var mPortfolioFragment = PortfolioFragment()
     private val mSettingsFragment = SettingsFragment()
     private val mGalleryFragment = GalleryFragment()
-    private val mAddNewItemFragment = AddNewItemFragment()
-    private val mMarketPricesFragment = MarketPricesFragment()
+    private var mAddNewItemFragment = AddNewItemFragment()
+    private var mMarketPricesFragment = MarketPricesFragment()
 
     private lateinit var mMainViewModel: MainViewModel
 
@@ -51,10 +47,9 @@ class MainActivity : AppCompatActivity() {
         initializeTimberLogging()
         initializeViewModel()
         initializeViews()
-        setDrawerNavigationToggle()
-        drawerNavigationItemSelectedListener()
-//        bottomNavigationItemSelectedListener()
-        handleDarkModeSwitch()
+//        setDrawerNavigationToggle()
+//        drawerNavigationItemSelectedListener()
+//        handleDarkModeSwitch()
         setBottomNavigation()
 
     } // onCreate End
@@ -106,102 +101,58 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setDrawerNavigationToggle() {
-        val toggle = ActionBarDrawerToggle(
-            this, mDrawerLayout, mToolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        mDrawerLayout.addDrawerListener(toggle)
-        toggle.isDrawerIndicatorEnabled = true
-        toggle.syncState()
-    }
+//    private fun setDrawerNavigationToggle() {
+//        val toggle = ActionBarDrawerToggle(
+//            this, mDrawerLayout, mToolbar,
+//            R.string.navigation_drawer_open,
+//            R.string.navigation_drawer_close
+//        )
+//        mDrawerLayout.addDrawerListener(toggle)
+//        toggle.isDrawerIndicatorEnabled = true
+//        toggle.syncState()
+//    }
 
 
-    private fun drawerNavigationItemSelectedListener() {
-        mNavigationView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-
-                R.id.nav_settings -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mSettingsFragment)
-                        addToBackStack(null)
-                        commit()
-                        setToolbarTitle(mSettingsFragment)
-                    }
-                    closeDrawerLayout()
-                    true
-                }
-
-                R.id.nav_gallery -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mGalleryFragment)
-                        addToBackStack(null)
-                        commit()
-                        setToolbarTitle(mGalleryFragment)
-                    }
-                    closeDrawerLayout()
-                    true
-                }
-                else -> false
-            }
-        }
-    } // drawerNavigationItemSelectedListener
-
-
-    private fun bottomNavigationItemSelectedListener() {
-        mBottomNavigation.setOnItemSelectedListener { item: MenuItem ->
-            when (item.itemId) {
-
-                R.id.portfolio -> {
-                    setToolbarTitle(mPortfolioFragment)
+//    private fun drawerNavigationItemSelectedListener() {
+//        mNavigationView.setNavigationItemSelectedListener {
+//            when (it.itemId) {
+//
+//                R.id.nav_settings -> {
 //                    supportFragmentManager.beginTransaction().apply {
-//                        replace(R.id.fragment_container, mPortfolioFragment)
+//                        replace(R.id.fragment_container, mSettingsFragment)
 //                        addToBackStack(null)
 //                        commit()
+//                        setToolbarTitle(mSettingsFragment)
 //                    }
-//                    setToolbarTitle(mPortfolioFragment)
-                    true
-                }
-
-                R.id.add_new_item -> {
-                    setToolbarTitle(mAddNewItemFragment)
-
+//                    closeDrawerLayout()
+//                    true
+//                }
+//
+//                R.id.nav_gallery -> {
 //                    supportFragmentManager.beginTransaction().apply {
-//                        replace(R.id.fragment_container, mAddNewItemFragment)
+//                        replace(R.id.fragment_container, mGalleryFragment)
 //                        addToBackStack(null)
 //                        commit()
+//                        setToolbarTitle(mGalleryFragment)
 //                    }
-//                    setToolbarTitle(mAddNewItemFragment)
-                    true
-                }
-
-                R.id.prices -> {
-                    setToolbarTitle(mMarketPricesFragment)
-
-//                    supportFragmentManager.beginTransaction().apply {
-//                        replace(R.id.fragment_container, mApiPricesFragment)
-//                        addToBackStack(null)
-//                        commit()
-//                    }
-//                    setToolbarTitle(mApiPricesFragment)
-                    true
-                }
-                else -> false
-            }
-        }
-    } // bottomNavigationItemSelectedListener
+//                    closeDrawerLayout()
+//                    true
+//                }
+//                else -> false
+//            }
+//        }
+//    } // drawerNavigationItemSelectedListener
 
 
-    private fun handleDarkModeSwitch() {
-        materialSwitch?.setOnCheckedChangeListener{ _, b ->
-            if (b) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-        }
-    }
+//    private fun handleDarkModeSwitch() {
+//        materialSwitch?.setOnCheckedChangeListener{ _, b ->
+//            if (b) {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//            } else {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//            }
+//        }
+//    }
 
 
     private fun setToolbarTitle(fragment: Fragment) {
@@ -216,9 +167,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun closeDrawerLayout() {
-        mDrawerLayout.closeDrawer(GravityCompat.START)
-    }
+//    private fun closeDrawerLayout() {
+//        mDrawerLayout.closeDrawer(GravityCompat.START)
+//    }
 
 
 
