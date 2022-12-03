@@ -1,9 +1,11 @@
 package com.kbratkovic.investmentgoldportfolio.util
 
+import com.kbratkovic.investmentgoldportfolio.BuildConfig
+
 class Constants {
 
     companion object {
-        const val API_KEY = "e6f51fe7491a802e413c2e27847f48c7"
+        const val API_KEY = BuildConfig.apiKey
         const val BASE_API_URL = "https://api.metalpriceapi.com/v1/"
 
         const val GOLD_CODE = "XAU"
