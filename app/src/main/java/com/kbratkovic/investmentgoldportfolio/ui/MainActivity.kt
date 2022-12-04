@@ -1,16 +1,20 @@
 package com.kbratkovic.investmentgoldportfolio.ui
 
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.navigation.NavigationView
 import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
@@ -29,11 +33,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mNavigationView: NavigationView
 
     private lateinit var mToolbar: Toolbar
-    private var materialSwitch: MaterialSwitch? = null
 
     private var mPortfolioFragment = PortfolioFragment()
     private val mSettingsFragment = SettingsFragment()
-    private val mGalleryFragment = GalleryFragment()
     private var mAddNewItemFragment = AddNewItemFragment()
     private var mMarketPricesFragment = MarketPricesFragment()
 
@@ -49,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         initializeViews()
 //        setDrawerNavigationToggle()
 //        drawerNavigationItemSelectedListener()
-//        handleDarkModeSwitch()
         setBottomNavigation()
 
     } // onCreate End
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         setupWithNavController(mBottomNavigation, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
+//            mBottomNavigation.menu.setGroupCheckable(0, true, true)
             if(destination.id == R.id.portfolio) {
                 setToolbarTitle(mPortfolioFragment)
             }
@@ -93,83 +95,74 @@ class MainActivity : AppCompatActivity() {
         mDrawerLayout = findViewById(R.id.drawer_layout)
         mNavigationView = findViewById(R.id.drawer_navigation_view)
         mBottomNavigation = findViewById(R.id.bottom_navigation)
-
-        val menuItem = mNavigationView.menu.findItem(R.id.switch_theme)
-        materialSwitch = menuItem.actionView?.findViewById(R.id.switch_dark_theme)
-
         setSupportActionBar(mToolbar)
     }
 
 
-//    private fun setDrawerNavigationToggle() {
-//        val toggle = ActionBarDrawerToggle(
-//            this, mDrawerLayout, mToolbar,
-//            R.string.navigation_drawer_open,
-//            R.string.navigation_drawer_close
-//        )
-//        mDrawerLayout.addDrawerListener(toggle)
-//        toggle.isDrawerIndicatorEnabled = true
-//        toggle.syncState()
-//    }
+    private fun setDrawerNavigationToggle() {
+        val toggle = ActionBarDrawerToggle(
+            this, mDrawerLayout, mToolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+        mDrawerLayout.addDrawerListener(toggle)
+        toggle.isDrawerIndicatorEnabled = true
+        toggle.syncState()
+    }
 
 
-//    private fun drawerNavigationItemSelectedListener() {
-//        mNavigationView.setNavigationItemSelectedListener {
-//            when (it.itemId) {
-//
-//                R.id.nav_settings -> {
-//                    supportFragmentManager.beginTransaction().apply {
-//                        replace(R.id.fragment_container, mSettingsFragment)
-//                        addToBackStack(null)
-//                        commit()
-//                        setToolbarTitle(mSettingsFragment)
-//                    }
-//                    closeDrawerLayout()
-//                    true
-//                }
-//
-//                R.id.nav_gallery -> {
-//                    supportFragmentManager.beginTransaction().apply {
-//                        replace(R.id.fragment_container, mGalleryFragment)
-//                        addToBackStack(null)
-//                        commit()
-//                        setToolbarTitle(mGalleryFragment)
-//                    }
-//                    closeDrawerLayout()
-//                    true
-//                }
-//                else -> false
-//            }
-//        }
-//    } // drawerNavigationItemSelectedListener
+    private fun drawerNavigationItemSelectedListener() {
+        mNavigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_settings -> {
+                    supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.fragment_container, mSettingsFragment)
+                        addToBackStack(null)
+                        commit()
+                        setToolbarTitle(mSettingsFragment)
+                    }
+                    mBottomNavigation.menu.setGroupCheckable(0, false, false)
+                    closeDrawerLayout()
+                    true
+                }
+                else -> false
+            }
+        }
+    } // drawerNavigationItemSelectedListener
 
 
-//    private fun handleDarkModeSwitch() {
-//        materialSwitch?.setOnCheckedChangeListener{ _, b ->
-//            if (b) {
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-//            } else {
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-//            }
-//        }
-//    }
+    // region settings
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_settings, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id  = item.itemId
+        if (id == R.id.menu_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    // endregion
 
 
     private fun setToolbarTitle(fragment: Fragment) {
         when(fragment) {
             mPortfolioFragment -> mToolbar.title = getString(R.string.menu_portfolio)
-            mSettingsFragment -> mToolbar.title = getString(R.string.menu_settings)
             mAddNewItemFragment -> mToolbar.title = getString(R.string.menu_add_new_item)
-            mGalleryFragment -> mToolbar.title = getString(R.string.menu_gallery)
             mMarketPricesFragment -> mToolbar.title = getString(R.string.menu_api_prices)
+            mSettingsFragment -> mToolbar.title = getString(R.string.menu_settings)
             else -> mToolbar.title = getString(R.string.app_name)
         }
     }
 
 
-//    private fun closeDrawerLayout() {
-//        mDrawerLayout.closeDrawer(GravityCompat.START)
-//    }
+    private fun closeDrawerLayout() {
+        mDrawerLayout.closeDrawer(GravityCompat.START)
+    }
 
 
 

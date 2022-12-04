@@ -59,6 +59,20 @@
     <string name="info_item_removed">Item removed successfully.</string>
     <string name="undo">UNDO</string>
     <string name="message_save_successfull">Item saved successfully</string>
+    <!-- Preference Titles -->
+    <string name="value_header">Default Values</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="currency_title">Default values</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
 </resources>

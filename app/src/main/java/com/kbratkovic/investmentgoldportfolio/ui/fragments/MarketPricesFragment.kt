@@ -83,7 +83,7 @@ class MarketPricesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.fragment_api_prices, container, false)
+        return inflater.inflate(R.layout.fragment_market_prices, container, false)
     } // end onCreateView
 
 

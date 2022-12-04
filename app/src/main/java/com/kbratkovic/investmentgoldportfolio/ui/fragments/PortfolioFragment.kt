@@ -1,6 +1,5 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
@@ -10,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -89,11 +89,13 @@ class PortfolioFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        getSharedPreference()
+//        getSharedPreference()
         initializeLayoutViews(view)
         startOnDataChangeListener()
-        getValuesFromDropdownMenus()
-        getValuesFromSharedPreferences()
+//        getPreferences()
+//        getValuesFromDropdownMenus()
+//        getValuesFromSharedPreferences()
+        getPreferences()
         handleRecyclerViewAndAdapter()
         displayDefaultZeroValues()
         observeInvestmentItemsChange()
@@ -105,7 +107,7 @@ class PortfolioFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        getPreferences()
         handleDropDownMenus()
         setValueToDropDownMenu()
         getMetalPriceFromApi()
@@ -118,14 +120,21 @@ class PortfolioFragment : Fragment() {
     }
 
 
-    private fun getSharedPreference() {
-        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME", MODE_PRIVATE)
-    }
+//    private fun getSharedPreference() {
+//        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME", MODE_PRIVATE)
+//    }
 
 
-    private fun getValuesFromSharedPreferences() {
-        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
-        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+//    private fun getValuesFromSharedPreferences() {
+//        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
+//        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+//    }
+
+
+    private fun getPreferences() {
+        sharedPreference =  PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mSelectedCurrency = sharedPreference.getString("currency", "").toString()
+        mSelectedWeight = sharedPreference.getString("weight", "").toString()
     }
 
 
@@ -431,5 +440,8 @@ class PortfolioFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(mRecyclerView)
     }
+
+
+
 
 }

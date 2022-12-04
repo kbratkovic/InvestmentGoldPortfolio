@@ -7,17 +7,13 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_baseline_settings_24"
             android:title="@string/menu_settings" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
 
-        <item
-            android:id="@+id/switch_theme"
-            android:icon="@drawable/ic_menu_camera"
-            app:actionLayout="@layout/dark_theme_switch_drawer"
-            android:title="@string/title_dark_theme" />
+<!--        <item-->
+<!--            android:id="@+id/switch_theme"-->
+<!--            android:icon="@drawable/ic_menu_camera"-->
+<!--            app:actionLayout="@layout/dark_theme_switch_drawer"-->
+<!--            android:title="@string/title_dark_theme" />-->
     </group>
 </menu>

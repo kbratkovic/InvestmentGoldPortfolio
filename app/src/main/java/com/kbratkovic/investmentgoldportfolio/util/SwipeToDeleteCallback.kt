@@ -46,7 +46,7 @@ abstract class SwipeToDeleteCallback internal constructor(context: Context) : It
     }
 
     override fun onChildDraw(
-        c: Canvas,
+        canvas: Canvas,
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         dX: Float,
@@ -54,19 +54,19 @@ abstract class SwipeToDeleteCallback internal constructor(context: Context) : It
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         val itemView: View = viewHolder.itemView
         val itemHeight: Int = itemView.height
         val isCancelled = dX == 0f && !isCurrentlyActive
         if (isCancelled) {
             clearCanvas(
-                c,
+                canvas,
                 itemView.right + dX,
                 itemView.top.toFloat(),
                 itemView.right.toFloat(),
                 itemView.bottom.toFloat()
             )
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             return
         }
         mBackground.color = mBackgroundColor
@@ -76,15 +76,15 @@ abstract class SwipeToDeleteCallback internal constructor(context: Context) : It
             itemView.right,
             itemView.bottom
         )
-        mBackground.draw(c)
+        mBackground.draw(canvas)
         val deleteIconTop: Int = itemView.top + (itemHeight - mIntrinsicHeight) / 2
         val deleteIconMargin = (itemHeight - mIntrinsicHeight) / 2
         val deleteIconLeft: Int = itemView.right - deleteIconMargin - mIntrinsicWidth
         val deleteIconRight: Int = itemView.right - deleteIconMargin
         val deleteIconBottom = deleteIconTop + mIntrinsicHeight
         mDeleteDrawable!!.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
-        mDeleteDrawable.draw(c)
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        mDeleteDrawable.draw(canvas)
+        super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
     private fun clearCanvas(c: Canvas, left: Float, top: Float, right: Float, bottom: Float) {

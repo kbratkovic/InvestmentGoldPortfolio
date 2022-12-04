@@ -1,0 +1,23 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/value_header">
+
+        <ListPreference
+            app:defaultValue="@string/currency_eur"
+            app:entries="@array/currency_items"
+            app:entryValues="@array/currency_items"
+            app:key="currency"
+            app:title="Currency"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="@string/weight_gram"
+            app:entries="@array/weight_items"
+            app:entryValues="@array/weight_items"
+            app:key="weight"
+            app:title="Weight"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
