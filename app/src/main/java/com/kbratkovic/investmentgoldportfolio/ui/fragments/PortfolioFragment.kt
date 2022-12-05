@@ -1,12 +1,16 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Display.Mode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.preference.PreferenceManager
@@ -31,8 +35,8 @@ import java.util.*
 
 class PortfolioFragment : Fragment() {
 
-    private var mSelectedCurrency: String = ""
-    private var mSelectedWeight: String = ""
+    private var mSelectedCurrency = Constants.CURRENCY_EUR_CODE
+    private var mSelectedWeight = Constants.WEIGHT_GRAM_CODE
     private var mDataSet: MutableList<InvestmentItem> = mutableListOf()
 
     private lateinit var mRecyclerView: RecyclerView
@@ -69,7 +73,7 @@ class PortfolioFragment : Fragment() {
     private val mLocaleUS = NumberFormat.getCurrencyInstance(Locale.US)
 
     private var mBottomNavigationView: BottomNavigationView? = null
-    private lateinit var sharedPreference: SharedPreferences
+    private lateinit var mSharedPreferences: SharedPreferences
 
 
     private val mMainViewModel: MainViewModel by activityViewModels()
@@ -89,25 +93,27 @@ class PortfolioFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        getSharedPreference()
+        getSharedPreference()
         initializeLayoutViews(view)
         startOnDataChangeListener()
 //        getPreferences()
 //        getValuesFromDropdownMenus()
 //        getValuesFromSharedPreferences()
-        getPreferences()
+//        getPreferences()
         handleRecyclerViewAndAdapter()
         displayDefaultZeroValues()
         observeInvestmentItemsChange()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
         enableSwipeToDeleteAndUndo()
 
+
     } // end onViewCreated
 
 
     override fun onResume() {
         super.onResume()
-        getPreferences()
+//        getPreferences()
+        getSharedPreference()
         handleDropDownMenus()
         setValueToDropDownMenu()
         getMetalPriceFromApi()
@@ -120,26 +126,28 @@ class PortfolioFragment : Fragment() {
     }
 
 
-//    private fun getSharedPreference() {
-//        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME", MODE_PRIVATE)
-//    }
+    private fun getSharedPreference() {
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
+        mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
+    }
 
 
 //    private fun getValuesFromSharedPreferences() {
-//        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
-//        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+//        mSelectedCurrency = mSharedPreferences.getString("currency", mSelectedCurrency).toString()
+//        mSelectedWeight = mSharedPreferences.getString("weight", mSelectedWeight).toString()
 //    }
 
 
     private fun getPreferences() {
-        sharedPreference =  PreferenceManager.getDefaultSharedPreferences(requireContext())
-        mSelectedCurrency = sharedPreference.getString("currency", "").toString()
-        mSelectedWeight = sharedPreference.getString("weight", "").toString()
+//        mSharedPreferences =  PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
+        mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
     }
 
 
     private fun putValuesToSharedPreferences() {
-        val editor = sharedPreference.edit()
+        val editor = mSharedPreferences.edit()
         editor.putString("currency", mSelectedCurrency)
         editor.putString("weight", mSelectedWeight)
         editor.apply()

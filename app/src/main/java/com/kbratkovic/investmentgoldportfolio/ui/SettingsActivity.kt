@@ -1,9 +1,11 @@
 package com.kbratkovic.investmentgoldportfolio.ui
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.preference.PreferenceManager
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ui.fragments.SettingsFragment
 
@@ -20,7 +22,8 @@ class SettingsActivity : AppCompatActivity() {
         initializeAndSetToolbar()
         setFragment()
         addOnBackPressedCallback()
-//        setPreferences()
+        setSharedPreferences()
+
     } // onCreate
 
 
@@ -28,6 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         mToolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.settings_toolbar)
         setSupportActionBar(mToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
     }
 
 
@@ -51,5 +55,9 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun setSharedPreferences() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+    }
 
 }

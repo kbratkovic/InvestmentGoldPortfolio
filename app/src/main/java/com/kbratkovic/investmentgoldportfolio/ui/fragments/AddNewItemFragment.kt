@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
@@ -63,7 +64,7 @@ class AddNewItemFragment : Fragment() {
 
     private var mInvestmentItem = InvestmentItem()
 
-    private lateinit var sharedPreference: SharedPreferences
+    private lateinit var mSharedPreferences: SharedPreferences
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -84,7 +85,7 @@ class AddNewItemFragment : Fragment() {
 
         getSharedPreference()
         initializeLayoutViews(view)
-        getValuesFromSharedPreferences()
+//        getValuesFromSharedPreferences()
         handleButtonSave()
         handleEditTextFocusListeners()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
@@ -93,7 +94,7 @@ class AddNewItemFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        getSharedPreference()
         handleDropDownMenus()
         handleEditTextFocusListeners()
         setValueToDropDownMenu()
@@ -108,20 +109,14 @@ class AddNewItemFragment : Fragment() {
 
 
     private fun getSharedPreference() {
-        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME",
-            Context.MODE_PRIVATE
-        )
-    }
-
-
-    private fun getValuesFromSharedPreferences() {
-        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
-        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
+        mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
     }
 
 
     private fun putValuesToSharedPreferences() {
-        val editor = sharedPreference.edit()
+        val editor = mSharedPreferences.edit()
         editor.putString("currency", mSelectedCurrency)
         editor.putString("weight", mSelectedWeight)
         editor.apply()

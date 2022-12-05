@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.kbratkovic.investmentgoldportfolio.BuildConfig
@@ -22,6 +23,7 @@ import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
 import com.kbratkovic.investmentgoldportfolio.ui.fragments.*
+import com.kbratkovic.investmentgoldportfolio.util.Constants
 import timber.log.Timber
 import timber.log.Timber.*
 
@@ -52,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 //        setDrawerNavigationToggle()
 //        drawerNavigationItemSelectedListener()
         setBottomNavigation()
-
+        setSharedPreferences()
     } // onCreate End
 
 
@@ -60,6 +62,15 @@ class MainActivity : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         }
+    }
+
+
+    private fun setSharedPreferences() {
+        val mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = mSharedPreferences.edit()
+        editor.putString("currency", Constants.CURRENCY_EUR_CODE)
+        editor.putString("weight", Constants.WEIGHT_GRAM_CODE)
+        editor.apply()
     }
 
 

@@ -1,7 +1,6 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +10,7 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.domain.models.MetalPrice
@@ -71,7 +71,7 @@ class MarketPricesFragment : Fragment() {
     private var mExchangeRateUSD = 0.0
     private var mExchangeRateEUR = 0.0
 
-    private lateinit var sharedPreference: SharedPreferences
+    private lateinit var mSharedPreferences: SharedPreferences
 
     private val mMainViewModel: MainViewModel by activityViewModels()
 
@@ -91,9 +91,9 @@ class MarketPricesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        getSharedPreference()
+//        getSharedPreference()
         initializeLayoutViews(view)
-        getValuesFromSharedPreferences()
+        getSharedPreference()
         displayDefaultZeroValues()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
 
@@ -102,11 +102,11 @@ class MarketPricesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        getSharedPreference()
         handleDropDownMenus()
         setValueToDropDownMenu()
         displayCurrentMarketPrices()
-        checkifHasInternetConnection()
+        checkIfHasInternetConnection()
     } // onResume
 
 
@@ -117,20 +117,14 @@ class MarketPricesFragment : Fragment() {
 
 
     private fun getSharedPreference() {
-        sharedPreference =  requireContext().getSharedPreferences("PREFERENCE_NAME",
-            Context.MODE_PRIVATE
-        )
-    }
-
-
-    private fun getValuesFromSharedPreferences() {
-        mSelectedCurrency = sharedPreference.getString("currency", mSelectedCurrency).toString()
-        mSelectedWeight = sharedPreference.getString("weight", mSelectedWeight).toString()
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
+        mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
     }
 
 
     private fun putValuesToSharedPreferences() {
-        val editor = sharedPreference.edit()
+        val editor = mSharedPreferences.edit()
         editor.putString("currency", mSelectedCurrency)
         editor.putString("weight", mSelectedWeight)
         editor.apply()
@@ -143,7 +137,7 @@ class MarketPricesFragment : Fragment() {
     }
 
 
-    private fun checkifHasInternetConnection() {
+    private fun checkIfHasInternetConnection() {
         if (!NetworkConnection.hasInternetConnection(requireContext())) {
             val bottomNavigationView: BottomNavigationView? = activity?.findViewById(R.id.bottom_navigation)
             if (bottomNavigationView != null) {
