@@ -1,6 +1,5 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.TextUtils
@@ -85,7 +84,6 @@ class AddNewItemFragment : Fragment() {
 
         getSharedPreference()
         initializeLayoutViews(view)
-//        getValuesFromSharedPreferences()
         handleButtonSave()
         handleEditTextFocusListeners()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()

@@ -1,6 +1,5 @@
-package com.kbratkovic.investmentgoldportfolio.ui
+package com.kbratkovic.investmentgoldportfolio.ui.activities
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity

@@ -91,12 +91,10 @@ class MarketPricesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        getSharedPreference()
         initializeLayoutViews(view)
         getSharedPreference()
         displayDefaultZeroValues()
         observeCurrentGoldPriceChangeFromMetalPriceApiCom()
-
     } // onViewCreated
 
 

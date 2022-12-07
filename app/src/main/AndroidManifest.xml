@@ -17,16 +17,16 @@
         android:theme="@style/Theme.InvestmentGoldPortfolio"
         tools:targetApi="31">
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.activities.SettingsActivity"
             android:label="@string/action_settings"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName=".ui.activities.MainActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
             android:label="@string/title_portfolio"

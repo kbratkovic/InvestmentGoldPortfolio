@@ -1,11 +1,10 @@
-package com.kbratkovic.investmentgoldportfolio.ui
+package com.kbratkovic.investmentgoldportfolio.ui.activities
 
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -22,6 +21,7 @@ import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
 import com.kbratkovic.investmentgoldportfolio.repository.Repository
+import com.kbratkovic.investmentgoldportfolio.ui.MainViewModel
 import com.kbratkovic.investmentgoldportfolio.ui.fragments.*
 import com.kbratkovic.investmentgoldportfolio.util.Constants
 import timber.log.Timber
@@ -51,8 +51,6 @@ class MainActivity : AppCompatActivity() {
         initializeTimberLogging()
         initializeViewModel()
         initializeViews()
-//        setDrawerNavigationToggle()
-//        drawerNavigationItemSelectedListener()
         setBottomNavigation()
         setSharedPreferences()
     } // onCreate End
@@ -67,10 +65,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setSharedPreferences() {
         val mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = mSharedPreferences.edit()
-        editor.putString("currency", Constants.CURRENCY_EUR_CODE)
-        editor.putString("weight", Constants.WEIGHT_GRAM_CODE)
-        editor.apply()
+        val currency = mSharedPreferences.getString("currency", "")
+        val weight = mSharedPreferences.getString("weight", "")
+        if (currency == "" && weight == "") {
+            val editor = mSharedPreferences.edit()
+            editor.putString("currency", Constants.CURRENCY_EUR_CODE)
+            editor.putString("weight", Constants.WEIGHT_GRAM_CODE)
+            editor.apply()
+        }
     }
 
 
@@ -80,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         setupWithNavController(mBottomNavigation, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-//            mBottomNavigation.menu.setGroupCheckable(0, true, true)
             if(destination.id == R.id.portfolio) {
                 setToolbarTitle(mPortfolioFragment)
             }
@@ -110,38 +111,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setDrawerNavigationToggle() {
-        val toggle = ActionBarDrawerToggle(
-            this, mDrawerLayout, mToolbar,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        mDrawerLayout.addDrawerListener(toggle)
-        toggle.isDrawerIndicatorEnabled = true
-        toggle.syncState()
-    }
-
-
-    private fun drawerNavigationItemSelectedListener() {
-        mNavigationView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_settings -> {
-                    supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.fragment_container, mSettingsFragment)
-                        addToBackStack(null)
-                        commit()
-                        setToolbarTitle(mSettingsFragment)
-                    }
-                    mBottomNavigation.menu.setGroupCheckable(0, false, false)
-                    closeDrawerLayout()
-                    true
-                }
-                else -> false
-            }
-        }
-    } // drawerNavigationItemSelectedListener
-
-
     // region settings
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_settings, menu)
@@ -169,12 +138,6 @@ class MainActivity : AppCompatActivity() {
             else -> mToolbar.title = getString(R.string.app_name)
         }
     }
-
-
-    private fun closeDrawerLayout() {
-        mDrawerLayout.closeDrawer(GravityCompat.START)
-    }
-
 
 
 }

@@ -1,16 +1,12 @@
 package com.kbratkovic.investmentgoldportfolio.ui.fragments
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Display.Mode
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.preference.PreferenceManager
@@ -96,10 +92,6 @@ class PortfolioFragment : Fragment() {
         getSharedPreference()
         initializeLayoutViews(view)
         startOnDataChangeListener()
-//        getPreferences()
-//        getValuesFromDropdownMenus()
-//        getValuesFromSharedPreferences()
-//        getPreferences()
         handleRecyclerViewAndAdapter()
         displayDefaultZeroValues()
         observeInvestmentItemsChange()
@@ -112,11 +104,15 @@ class PortfolioFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        getPreferences()
         getSharedPreference()
         handleDropDownMenus()
         setValueToDropDownMenu()
         getMetalPriceFromApi()
+
+        setTotalPurchasePrice()
+        setTotalWeight()
+        setCurrentMarketValue()
+        setTotalProfitValue()
     } // onResume
 
 
@@ -128,19 +124,6 @@ class PortfolioFragment : Fragment() {
 
     private fun getSharedPreference() {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
-        mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
-    }
-
-
-//    private fun getValuesFromSharedPreferences() {
-//        mSelectedCurrency = mSharedPreferences.getString("currency", mSelectedCurrency).toString()
-//        mSelectedWeight = mSharedPreferences.getString("weight", mSelectedWeight).toString()
-//    }
-
-
-    private fun getPreferences() {
-//        mSharedPreferences =  PreferenceManager.getDefaultSharedPreferences(requireContext())
         mSelectedCurrency = mSharedPreferences.getString("currency", "").toString()
         mSelectedWeight = mSharedPreferences.getString("weight", "").toString()
     }
@@ -383,12 +366,6 @@ class PortfolioFragment : Fragment() {
         mTotalPurchasePriceInUSD = BigDecimal.ZERO
         mTotalWeightInGrams = 0.0
         mTotalWeightInTroyOunce = 0.0
-    }
-
-
-    private fun getValuesFromDropdownMenus() {
-        mSelectedWeight = mAutoCompleteTextViewWeight.text.toString()
-        mSelectedCurrency = mAutoCompleteTextViewCurrency.text.toString()
     }
 
 
