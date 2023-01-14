@@ -91,6 +91,7 @@ class PortfolioFragment : Fragment() {
 
         getSharedPreference()
         initializeLayoutViews(view)
+        getMetalPriceFromApi()
         startOnDataChangeListener()
         handleRecyclerViewAndAdapter()
         displayDefaultZeroValues()
@@ -107,7 +108,7 @@ class PortfolioFragment : Fragment() {
         getSharedPreference()
         handleDropDownMenus()
         setValueToDropDownMenu()
-        getMetalPriceFromApi()
+//        getMetalPriceFromApi()
 
         setTotalPurchasePrice()
         setTotalWeight()

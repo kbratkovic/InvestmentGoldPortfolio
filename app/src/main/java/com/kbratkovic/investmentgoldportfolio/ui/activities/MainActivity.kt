@@ -14,9 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.preference.PreferenceManager
+import com.airbnb.viewmodeladapter.BuildConfig
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.kbratkovic.investmentgoldportfolio.BuildConfig
 import com.kbratkovic.investmentgoldportfolio.R
 import com.kbratkovic.investmentgoldportfolio.ViewModelProviderFactory
 import com.kbratkovic.investmentgoldportfolio.database.AppDatabase
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     private fun initializeViews() {
         mToolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         mDrawerLayout = findViewById(R.id.drawer_layout)
-        mNavigationView = findViewById(R.id.drawer_navigation_view)
+//        mNavigationView = findViewById(R.id.drawer_navigation_view)
         mBottomNavigation = findViewById(R.id.bottom_navigation)
         setSupportActionBar(mToolbar)
     }

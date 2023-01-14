@@ -7,6 +7,20 @@ plugins {
 apply plugin: 'kotlin-kapt'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('D:\\AndroidStudioProjects\\keyStore.jks')
+            storePassword '12keyStore34'
+            keyPassword '12keyStore34'
+            keyAlias 'key0'
+        }
+        release {
+            storeFile file('D:\\AndroidStudioProjects\\keyStore.jks')
+            storePassword '12keyStore34'
+            keyPassword '12keyStore34'
+            keyAlias 'key0'
+        }
+    }
     namespace 'com.kbratkovic.investmentgoldportfolio'
     compileSdk 33
 
@@ -18,13 +32,14 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
         release {
             // Enables code shrinking, obfuscation, and optimization for only
             // your project's release build type.
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
